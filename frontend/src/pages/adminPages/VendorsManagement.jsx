@@ -3,7 +3,9 @@ import axios from "axios";
 
 function VendorsManagement(){
 
-    const API_URL="http://localhost:8000";
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+
+    //const API_URL="http://localhost:8000";
 
     const [vendors,setVendors]=useState([]);
 

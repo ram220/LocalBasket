@@ -8,8 +8,9 @@ function OrderSummary({ cart,setCart }) {
   const [mobile,setMobile]=useState("");
 
   const navigate=useNavigate()
-   
-  const API_URL = "http://localhost:8000";
+  
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  //const API_URL = "http://localhost:8000";
 
   const [paymentMethod,setPaymentMethod] = useState("COD");
 
@@ -36,7 +37,7 @@ function OrderSummary({ cart,setCart }) {
       }
     }
     fetchUserDeatils();
-  },[])
+  },[token])
 
   const itemsTotal = cart.reduce((total,item)=>{
     return total + item.finalPrice * item.quantity;
@@ -49,7 +50,6 @@ function OrderSummary({ cart,setCart }) {
         alert("Cart is empty, add items to cart and try");
         return;
     }
-    console.log(paymentMethod);
 
     const orderData = {
         items: cart.map(item=>({
@@ -81,7 +81,6 @@ function OrderSummary({ cart,setCart }) {
           {headers:{Authorization:`Bearer ${token}`}}
         );
 
-        console.log(razorOrder);
         
         const options={
           key:"rzp_live_RMI6AqNDqxjfS8",

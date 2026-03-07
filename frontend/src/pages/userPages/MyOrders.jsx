@@ -4,7 +4,9 @@ import axios from "axios";
 function MyOrders() {
   const [orders,setOrders]=useState([]);
 
-  const API_URL = "http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  //const API_URL = "http://localhost:8000";
+  
 
   const token=localStorage.getItem("token")
 
@@ -18,7 +20,6 @@ function MyOrders() {
           headers:{Authorization:`Bearer ${token}`}
         })
 
-        console.log(res.data);
         setOrders(res.data.orders);
       }
       catch(err){

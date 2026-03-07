@@ -6,7 +6,8 @@ function ViewProducts() {
     const [page, setPage] = useState(1);
     const [totalPages,setTotalPages]=useState(1);
 
-    const API_URL="http://localhost:8000";
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
+    //const API_URL="http://localhost:8000";
 
     const token=localStorage.getItem("token");
 
@@ -16,7 +17,6 @@ function ViewProducts() {
                 const res=await axios.get(`${API_URL}/api/vendor/fetchProducts?page=${page}`,{
                     headers:{Authorization:`Bearer ${token}`}
                 })
-                console.log(res.data);
                 setProducts(res.data.products.map((p)=>(
                   {...p, origainalPrice: p.price}
                 )))
@@ -60,7 +60,7 @@ function ViewProducts() {
             );
         }
         catch(err){
-            console.log(err);
+            alert(err.response?.data.message || "Something went wrong while updating product");
         }
     }
 

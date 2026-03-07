@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import TopNavBar from "../../components/userComponents/TopNavBar";
 import Footer from "../../components/userComponents/Footer";
 import "./AllProducts.css";
 import { useOutletContext } from "react-router-dom";
@@ -10,7 +9,9 @@ function AllProducts() {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("all");
 
-  const API_URL = "http://localhost:8000";
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+
+  //const API_URL = "http://localhost:8000";
 
   const {fetchCart} = useOutletContext();
 
@@ -26,7 +27,7 @@ function AllProducts() {
         //setProducts(res.data.filteredProducts);
         setProducts(res.data.finalProducts || []);
       } catch (err) {
-        console.log(err);
+        alert(err.response?.data.message || "Something went wrong while fetching Products");
       }
     };
 
@@ -41,7 +42,7 @@ function AllProducts() {
       return;
     }
     try{
-      const res=await axios.post(`${API_URL}/api/cart/addToCart`,
+        await axios.post(`${API_URL}/api/cart/addToCart`,
         {
           productId,
           quantity:1

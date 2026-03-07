@@ -12,6 +12,9 @@ function UserRegister() {
     mobile: "",
   })
 
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
+  //const API_URL="http://localhost:8000"
+
   const [errors,setErrors]=useState({})
 
   const navigate=useNavigate();
@@ -26,15 +29,14 @@ function UserRegister() {
       }
       
       try{
-        const res = await axios.post("http://localhost:8000/api/auth/register-user",formData);
-        console.log(res.data);
+        await axios.post(`http://localhost:8000/api/auth/register-user`,formData);
 
         alert("user account created successfully");
 
         navigate("/login");
       }
       catch(err){
-        console.log(err.response?.data);
+        
         setErrors({general:err.response?.data.message || "error while creating user account"});
       }
   }

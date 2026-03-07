@@ -7,7 +7,6 @@ import VendorRegister from './pages/vendorPages/VendorRegister';
 import Products from './pages/userPages/Products';
 import AllProducts from './pages/userPages/AllProducts';
 import VendorLayout from './layouts/VendorLayout';
-import VendorDashboard from './pages/vendorPages/VendorDashboard';
 import AddProduct from './pages/vendorPages/AddProduct';
 import ViewProducts from './pages/vendorPages/ViewProducts';
 import ProductDetails from './pages/userPages/ProductDetails';
@@ -29,7 +28,8 @@ import AdminOrders from './pages/adminPages/AdminOrders';
 
 function App() {
 
-  const API_URL="http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
+  //const API_URL="http://localhost:8000";
 
 const [isLoggedIn, setIsLoggedIn] = useState(() => {
   const token = localStorage.getItem("token");
@@ -55,7 +55,6 @@ const [isLoggedIn, setIsLoggedIn] = useState(() => {
         headers:{Authorization:`Bearer ${token}`}
       })
 
-      console.log(res.data);
       setCart(res.data.cart.items);
     }
     catch(err){

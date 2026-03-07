@@ -1,5 +1,4 @@
 import './Home.css'
-import TopNavBar from '../../components/userComponents/TopNavBar';
 import Footer from '../../components/userComponents/Footer';
 import axios from 'axios'
 import { useState,useEffect } from 'react';
@@ -8,7 +7,9 @@ import { useNavigate } from 'react-router-dom';
 function Home(){
     const [stores,setStores]=useState([]);
 
-    const API_URL="http://localhost:8000"
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+
+    //const API_URL="http://localhost:8000"
 
     const navigate=useNavigate();
 
@@ -55,6 +56,7 @@ function Home(){
                             <img 
                                 src={s.image} 
                                 className="card-img-top"
+                                alt={s.name}
                                 style={{ height: "150px", objectFit: "cover" }}
                             />
                             <div className="card-body text-center">

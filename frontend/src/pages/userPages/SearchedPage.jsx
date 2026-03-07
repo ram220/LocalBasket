@@ -10,8 +10,8 @@ function SearchedPage() {
 
   const {fetchCart} = useOutletContext();
 
-
-  const API_URL = "http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  //const API_URL = "http://localhost:8000";
   
   const token=localStorage.getItem("token"); 
 
@@ -28,7 +28,6 @@ function SearchedPage() {
           `${API_URL}/api/user/searchedProduct?q=${query}`
         );
 
-        console.log("Search Results 👉", res.data);
         setSearchedItems(res.data.products || []);
       } catch (err) {
         console.error(err);

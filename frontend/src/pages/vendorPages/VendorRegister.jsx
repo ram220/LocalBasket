@@ -15,6 +15,9 @@ function VendorRegister() {
     mobile:""
   });
 
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
+  //const API_URL="http://localhost:8000";
+
   const [errors,setErrors]=useState({});
 
   const navigate=useNavigate();
@@ -28,15 +31,13 @@ function VendorRegister() {
     }
 
     try{
-      const res = await axios.post("http://localhost:8000/api/auth/register-vendor",formData);
-      console.log(res.data);
+      const res = await axios.post(`${API_URL}/api/auth/register-vendor`,formData);
 
       alert("vendor account created successfully");
 
       navigate('/login');
     }
     catch(err){
-      console.log(err.response?.data);
       setErrors({general:err.response?.data.message || "error while creating vendor account"})
     }
 

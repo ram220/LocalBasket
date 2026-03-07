@@ -9,8 +9,8 @@ function Chatbot({setCart}) {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
 
-  //  const API_URL = "https://two47withgrocerystoreram-backend.onrender.com";
-  const API_URL = "http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  //const API_URL = "http://localhost:8000";
 
   // Auto scroll to bottom
   useEffect(() => {

@@ -9,7 +9,9 @@ function Products() {
 
   const {fetchCart} = useOutletContext();
   
-  const API_URL = "http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  //const API_URL = "http://localhost:8000";
+
   const token=localStorage.getItem("token");
   useEffect(() => {
     const fetchProducts = async () => {
@@ -17,7 +19,7 @@ function Products() {
         const res = await axios.get(`${API_URL}/api/user/products/${id}`);
         setProducts(res.data.products);
       } catch (err) {
-        console.log(err);
+        alert(err.response?.data.message || "Something went wrong while fetching products");
       }
     };
 

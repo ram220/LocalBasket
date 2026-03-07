@@ -7,7 +7,9 @@ function AdminOrders(){
     const [currentPage,setCurrentPage]=useState(1);
     const [totalPages,setTotalPages]=useState(1);
 
-    const API_URL="http://localhost:8000";
+
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+    //const API_URL="http://localhost:8000";
     const token=localStorage.getItem("token");
 
     useEffect(()=>{

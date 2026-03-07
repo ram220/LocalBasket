@@ -15,7 +15,8 @@ function AddProduct() {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
-  const API_URL="http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
+  //const API_URL="http://localhost:8000";
 
   const handleChange=(e)=>{
     setFormData({...formData, [e.target.name]: e.target.value})
@@ -39,7 +40,7 @@ function AddProduct() {
       if (image) {
         data.append("image", image);
       }
-      const res=await axios.post(`${API_URL}/api/vendor/addProduct`,
+      await axios.post(`${API_URL}/api/vendor/addProduct`,
         data,
         {
           headers: {Authorization:`Bearer ${token}`, "Content-Type": "multipart/form-data"}

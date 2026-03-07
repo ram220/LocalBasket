@@ -8,7 +8,8 @@ import { useOutletContext } from "react-router-dom";
 function ProductDetails() {
   const { productId } = useParams();
 
-  const API_URL = "http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  //const API_URL = "http://localhost:8000";
 
   const {fetchCart} = useOutletContext();
 
@@ -23,13 +24,11 @@ function ProductDetails() {
     useEffect(() => {
       const fetchProduct = async () => {
         const res = await axios.get(`${API_URL}/api/user/product/${productId}`);
-        console.log(res.data);
         setProduct(res.data.product);
       };
 
       const fetchRecommendations = async () => {
         const res = await axios.get(`${API_URL}/api/user/recommended/${productId}`);
-        console.log(res.data);
         setRecommended(res.data.recommendedProducts);
       };
 
@@ -46,7 +45,7 @@ function ProductDetails() {
           return;
         }
         try{
-          const res=await axios.post(`${API_URL}/api/cart/addToCart`,
+          await axios.post(`${API_URL}/api/cart/addToCart`,
             {
               productId,
               quantity:1

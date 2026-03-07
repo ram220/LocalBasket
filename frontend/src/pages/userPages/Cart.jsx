@@ -1,4 +1,4 @@
-import { useState,useEffect } from "react";
+import { useEffect } from "react";
 import axios from 'axios'
 
 import './Cart.css'
@@ -7,7 +7,9 @@ function Cart({cart,setCart,fetchCart}) {
 
 
     const token=localStorage.getItem("token");
-    const API_URL = "http://localhost:8000";
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+
+    //const API_URL = "http://localhost:8000";
     useEffect(()=>{
         if(!token) return;
         fetchCart();

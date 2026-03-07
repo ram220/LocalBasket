@@ -9,6 +9,10 @@ function Login({setIsLoggedIn,fetchCart}) {
   const [role,setRole]=useState("user");
   const [errors,setErrors]=useState({});
 
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+    //const API_URL="http://localhost:8000"
+
+
   
   const navigate=useNavigate();
 
@@ -27,9 +31,9 @@ function Login({setIsLoggedIn,fetchCart}) {
         setErrors("Please select a role")
         return
       }
-      if(role==="user") url = "http://localhost:8000/api/auth/login-user";
-      else if(role==="vendor") url = "http://localhost:8000/api/auth/login-vendor";
-      else url = "http://localhost:8000/api/auth/login-admin";
+      if(role==="user") url = `${API_URL}/api/auth/login-user`;
+      else if(role==="vendor") url = `${API_URL}/api/auth/login-vendor`;
+      else url = `${API_URL}/api/auth/login-admin`;
 
       const res=await axios.post(url,{email:formData.email,password:formData.password});
       const token=res.data.token;
@@ -48,7 +52,6 @@ function Login({setIsLoggedIn,fetchCart}) {
       else navigate("/admin");
     }
     catch(err){
-      console.log(err.response?.data);
       setErrors({general:err.response?.data.message || "login failed"});
     }
 

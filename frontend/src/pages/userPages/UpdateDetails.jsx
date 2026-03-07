@@ -9,7 +9,8 @@ function ChangeAddress() {
 
   const token=localStorage.getItem("token");
 
-  const API_URL = "http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  //const API_URL = "http://localhost:8000";
 
   // Fetch current details
   useEffect(() => {
@@ -30,7 +31,7 @@ function ChangeAddress() {
         }
     }
     getUserDetails();
-  }, []);
+  }, [token]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
