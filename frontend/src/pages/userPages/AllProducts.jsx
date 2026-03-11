@@ -9,7 +9,7 @@ function AllProducts() {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("all");
 
-    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
 
   //const API_URL = "http://localhost:8000";
 
@@ -74,7 +74,7 @@ function AllProducts() {
 
         {/* 🔥 CATEGORY FILTER */}
         <div className="products-filter">
-          {["all", "Grocery", "Junk Foods", "Medical", "Bakery","Sweets","Shakes & Juices"].map((cat) => (
+          {["all", "Grocery", "Junk Foods", "Medical", "Bakery","Sweets","Fruits & Juices"].map((cat) => (
             <button
               key={cat}
               className="products-btn"

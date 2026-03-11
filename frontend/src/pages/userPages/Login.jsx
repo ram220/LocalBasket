@@ -33,12 +33,13 @@ function Login({setIsLoggedIn,fetchCart}) {
       }
       if(role==="user") url = `${API_URL}/api/auth/login-user`;
       else if(role==="vendor") url = `${API_URL}/api/auth/login-vendor`;
+      else if(role==="delivery_agent") url = `${API_URL}/api/auth/login-agent`;
       else url = `${API_URL}/api/auth/login-admin`;
 
       const res=await axios.post(url,{email:formData.email,password:formData.password});
       const token=res.data.token;
       localStorage.setItem("token",token);
-      localStorage.setItem("role",res.data.user?.role || role);
+      localStorage.setItem("role",res.data.role || role);
       setIsLoggedIn(true);
       if(role === "user" && fetchCart){
         fetchCart();
@@ -49,6 +50,7 @@ function Login({setIsLoggedIn,fetchCart}) {
       //redirect base on role
       if(role === "user") navigate("/");
       else if(role === "vendor") navigate("/vendor");
+      else if(role==="delivery_agent") navigate("/agent")
       else navigate("/admin");
     }
     catch(err){
@@ -84,6 +86,7 @@ function Login({setIsLoggedIn,fetchCart}) {
                 <select className="form-select" value={role} onChange={(e)=>setRole(e.target.value)}>
                   <option value="user">User</option>
                   <option value="vendor">Vendor</option>
+                  <option value="delivery_agent">Delivery Agent</option>
                   <option value="admin">Admin</option>
                 </select>
               </div>

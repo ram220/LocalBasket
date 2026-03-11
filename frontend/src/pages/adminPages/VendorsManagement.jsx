@@ -51,69 +51,100 @@ function VendorsManagement(){
         fetchVendors();
     }
 
+    const activateVendor=async(id)=>{
+        await axios.patch(`${API_URL}/api/admin/activateSubscription/${id}`,{},{
+            headers:{Authorization:`Bearer ${token}`}
+        })
+        fetchVendors();
+    }
+
     return(
-
-        <div className="table-responsive">
-
+        <>
             <h3 className="mb-4">Vendor Management</h3>
+            {
+                vendors.length >0 ?(
+                    <div className="table-responsive">
 
-            <table className="table table-bordered">
 
-                <thead>
+                        <table className="table table-bordered">
 
-                    <tr>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
+                            <thead>
 
-                </thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Vendor Status</th>
+                                    <th>Plan</th>
+                                    <th>Days Left</th>
+                                    <th>Actions</th>
+                                </tr>
 
-                <tbody>
+                            </thead>
 
-                    {vendors.map(v=>(
-                        <tr key={v._id}>
+                            <tbody>
 
-                            <td>{v.name}</td>
+                                {vendors.map(v=>(
+                                    <tr key={v._id}>
 
-                            <td>{v.email}</td>
+                                        <td>{v.name}</td>
 
-                            <td>{v.status}</td>
+                                        <td>{v.email}</td>
 
-                            <td className="d-flex flex-wrap gap-2">
+                                        <td>{v.status}</td>
 
-                                <button
-                                className="btn btn-success btn-sm me-2"
-                                onClick={()=>approveVendor(v._id)}
-                                >
-                                    Approve
-                                </button>
+                                        <td>
+                                            {v.subscriptionStatus ? v.subscriptionStatus : "inactive"}
+                                        </td>
 
-                                <button
-                                className="btn btn-warning btn-sm me-2"
-                                onClick={()=>rejectVendor(v._id)}
-                                >
-                                    Reject
-                                </button>
+                                        <td>
+                                            {v.daysLeft !== undefined ? v.daysLeft : "-"}
+                                        </td>
 
-                                <button
-                                className="btn btn-danger btn-sm"
-                                onClick={()=>deleteVendor(v._id)}
-                                >
-                                    Delete
-                                </button>
+                                        <td className="d-flex flex-wrap gap-2">
 
-                            </td>
+                                            <button
+                                            className="btn btn-success btn-sm me-2"
+                                            onClick={()=>approveVendor(v._id)}
+                                            >
+                                                Approve
+                                            </button>
 
-                        </tr>
-                    ))}
+                                            <button
+                                            className="btn btn-warning btn-sm me-2"
+                                            onClick={()=>rejectVendor(v._id)}
+                                            >
+                                                Reject
+                                            </button>
 
-                </tbody>
+                                            <button
+                                                className="btn btn-primary btn-sm"
+                                                onClick={()=>activateVendor(v._id)}
+                                                >
+                                                Activate Plan
+                                            </button>
 
-            </table>
+                                            <button
+                                            className="btn btn-danger btn-sm"
+                                            onClick={()=>deleteVendor(v._id)}
+                                            >
+                                                Delete
+                                            </button>
 
-        </div>
+                                        </td>
+
+                                    </tr>
+                                ))}
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+                )
+                :
+                (<p>No Vendors found</p>)
+            }
+        </>
     )
 }
 

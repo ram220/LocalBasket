@@ -117,11 +117,12 @@ function AddProduct() {
               style={{ width: "230px" }}
             >
               <option>Select Category</option>
-              <option>Oils</option>
-              <option>vegetables</option>
-              <option>dairy</option>
-              <option>Rice</option>
-              <option>spices</option>
+              <option>Grocery</option>
+              <option>Junk Foods</option>
+              <option>Medical</option>
+              <option>Bakery</option>
+              <option>Sweets</option>
+              <option>Fruits & Juices</option>
             </select>
           </div>
 

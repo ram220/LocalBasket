@@ -15,6 +15,17 @@ function AdminSideNavbar(){
                     <h6>Orders</h6>
                 </Link>
             </div>
+            <div className="back mt-3">
+                <Link className="d-block" to="/admin/add_agent">
+                    <h6>Add Agent</h6>
+                </Link>
+            </div>
+            <div className="back mt-3">
+                <Link className="d-block" to="/admin/agents">
+                <h6>Manage Agents</h6>
+                </Link>
+            </div>
+
 
         </div>
     )

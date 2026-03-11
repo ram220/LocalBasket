@@ -38,6 +38,8 @@ function TotalIncome() {
 
       } catch (err) {
         console.error("Error fetching income:", err);
+        const message=err.response?.data.message || "something went wrong while fetching income";
+        alert(message);
       }
     };
 

@@ -25,6 +25,10 @@ import Chatbot from './pages/userPages/Chatbot';
 import VendorsManagement from './pages/adminPages/VendorsManagement';
 import AdminLayout from './layouts/AdminLayouts';
 import AdminOrders from './pages/adminPages/AdminOrders';
+import AddDeliveryAgent from './pages/adminPages/AddDeliveryAgent';
+import ManageAgents from './pages/adminPages/ManageAgents';
+import DeliveryAgentLayout from './layouts/DeliveryAgentLayout';
+import AgentOrders from './pages/deliveryPartnerPages/AgentOrders';
 
 function App() {
 
@@ -141,6 +145,18 @@ const logoutUser = () => {
 
           <Route path="vendors" element={<VendorsManagement/>}/>
           <Route path="orders" element={<AdminOrders/>}/>
+          <Route path='add_agent' element={<AddDeliveryAgent/>}/>
+          <Route path='agents' element={<ManageAgents/>}/>
+
+        </Route>
+
+        <Route path='/agent/*' 
+          element={isLoggedIn && localStorage.getItem("role")==="delivery_agent"
+            ? <DeliveryAgentLayout logoutUser={logoutUser}/>
+            : <Login setIsLoggedIn={setIsLoggedIn}/>}>
+
+              <Route path='orders' element={<AgentOrders/>}/>
+
 
         </Route>
 

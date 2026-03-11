@@ -7,6 +7,8 @@ function AdminOrders(){
     const [currentPage,setCurrentPage]=useState(1);
     const [totalPages,setTotalPages]=useState(1);
 
+    const [agents,setAgents] = useState([]);
+
 
     const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
     //const API_URL="http://localhost:8000";
@@ -34,6 +36,7 @@ function AdminOrders(){
         }
 
         fetchOrders();
+        fetchAgents();
 
     },[currentPage,token]);
 
@@ -59,6 +62,39 @@ function AdminOrders(){
             alert("Error updating order status")
         }
     }
+
+
+    const fetchAgents = async()=>{
+        const res = await axios.get(`${API_URL}/api/admin/getApprovedAgents`,{
+            headers:{Authorization:`Bearer ${token}`}
+        });
+
+        setAgents(res.data.agents);
+    };
+
+
+    const handleAssignAgent = async(orderId,agentId)=>{
+    try{
+
+        await axios.post(`${API_URL}/api/admin/assignDeliveryAgent`,
+            {orderId,agentId},
+            {headers:{Authorization:`Bearer ${token}`}}
+        )
+
+        alert("Agent assigned successfully");
+
+        // REFRESH ORDERS
+        const res = await axios.get(`${API_URL}/api/admin/getAllOrders?page=${currentPage}`,{
+        headers:{Authorization:`Bearer ${token}`}
+        });
+
+        setOrders(res.data.orders);
+
+    }
+    catch(err){
+        alert("Error assigning agent");
+    }
+}
 
 
     return(
@@ -105,6 +141,57 @@ function AdminOrders(){
                                     <p>Address: <strong>{order.userId?.address}</strong></p>
 
                                     <p>Payment Status: <strong>{order.paymentStatus}</strong></p>
+
+                                   {
+                                        !order.deliveryAgentId && (
+
+                                            <div className="mb-3">
+                                                <label><strong>Assign Delivery Agent</strong></label>
+
+                                                <select
+                                                    className="form-control"
+                                                    onChange={(e)=>handleAssignAgent(order._id,e.target.value)}
+                                                >
+
+                                                    <option value="">Select Agent</option>
+
+                                                        {agents.map(agent=>(
+                                                        <option key={agent._id} value={agent._id}>
+                                                        {agent.name}
+                                                    </option>
+                                                        ))}
+
+                                                </select>
+
+                                            </div>
+
+                                        )
+                                    }
+
+                                    <p>Delivery Status:
+                                        <span className={`badge ms-2 ${
+                                        order.deliveryStatus === "Delivered"
+                                            ? "bg-success"
+                                            : order.deliveryStatus === "Out for Delivery"
+                                            ? "bg-primary"
+                                            : order.deliveryStatus === "Picked"
+                                            ? "bg-warning text-dark"
+                                            : order.deliveryStatus === "Assigned"
+                                            ? "bg-info text-dark"
+                                            : "bg-secondary"
+                                        }`}>
+                                            {order.deliveryStatus}
+                                        </span>
+                                    </p>
+
+
+                                    <p>Delivery Agent:
+                                        <strong>
+                                            {order.deliveryAgentId
+                                            ? `${order.deliveryAgentId.name} (${order.deliveryAgentId.mobile})`
+                                            : "Not Assigned"}
+                                        </strong>
+                                    </p>
                                     
                                     <div className="mb-2">
                                         <label><strong>Order Status</strong></label>

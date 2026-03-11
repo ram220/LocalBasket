@@ -30,7 +30,8 @@ function SearchedPage() {
 
         setSearchedItems(res.data.products || []);
       } catch (err) {
-        console.error(err);
+        const message=err.response?.data.message || "something went wrong while searching product";
+        alert(message);
       }
     };
 

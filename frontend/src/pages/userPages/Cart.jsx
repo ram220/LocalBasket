@@ -7,7 +7,7 @@ function Cart({cart,setCart,fetchCart}) {
 
 
     const token=localStorage.getItem("token");
-    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
 
     //const API_URL = "http://localhost:8000";
     useEffect(()=>{

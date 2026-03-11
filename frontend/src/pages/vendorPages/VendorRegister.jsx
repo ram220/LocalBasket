@@ -10,6 +10,7 @@ function VendorRegister() {
     email:"",
     password:"",
     shopName:"",
+    shopImage:null,
     category:"",
     address:"",
     mobile:""
@@ -31,13 +32,21 @@ function VendorRegister() {
     }
 
     try{
-      await axios.post(`${API_URL}/api/auth/register-vendor`,formData);
+      const data=new FormData();
+
+      for(let key in formData){
+        data.append(key,formData[key]);
+      }
+      await axios.post(`${API_URL}/api/auth/register-vendor`,data,{
+        headers:{"Content-Type":"multipart/form-data"}
+      });
 
       alert("vendor account created successfully");
 
       navigate('/login');
     }
     catch(err){
+      console.log(err);
       setErrors({general:err.response?.data.message || "error while creating vendor account"})
     }
 
@@ -76,6 +85,18 @@ function VendorRegister() {
                 <label>Shop Name</label>
                 <input className="form-control" type="text" value={formData.shopName} onChange={(e)=>setFormData({...formData, shopName:e.target.value})}/>
               </div>
+
+              <div className="mb-3">
+  <label>Shop Image</label>
+  <input
+    className="form-control"
+    type="file"
+    accept="image/*"
+    onChange={(e)=>
+      setFormData({...formData, shopImage:e.target.files[0]})
+    }
+  />
+</div>
 
               <div className="mb-3">
                 <label>Category</label>

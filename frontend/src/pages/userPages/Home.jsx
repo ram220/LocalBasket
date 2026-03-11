@@ -54,7 +54,7 @@ function Home(){
                     <div className="col-12 col-sm-6 col-md-4 col-lg-3" key={s._id} onClick={()=>navigate(`/store/${s._id}`)} style={{cursor:"pointer"}}>
                         <div className="card p-3 shadow-sm h-100">
                             <img 
-                                src={s.image} 
+                                src={s.shopImage} 
                                 className="card-img-top"
                                 alt={s.name}
                                 style={{ height: "150px", objectFit: "cover" }}

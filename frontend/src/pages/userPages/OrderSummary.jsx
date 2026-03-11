@@ -54,6 +54,7 @@ function OrderSummary({ cart,setCart }) {
     const orderData = {
         items: cart.map(item=>({
             productId:item.productId._id,
+            name:item.productId.name,
             quantity:item.quantity,
             price:item.finalPrice,
             image:item.productId.image,

@@ -73,6 +73,20 @@ function MyOrders() {
                 <p>Total Amount: ₹{order.totalAmount}</p>
                 <p>Payment Status: {order.paymentStatus}</p>
                 <p>Order Status: {order.orderStatus}</p>
+                <p>
+Delivery Status:
+<strong style={{marginLeft:"5px"}}>
+{order.deliveryStatus}
+</strong>
+</p>
+                <p>
+Delivery Agent:
+<strong>
+{order.deliveryAgentId
+  ? `${order.deliveryAgentId.name} (${order.deliveryAgentId.mobile})`
+  : "Not Assigned Yet"}
+</strong>
+</p>
                 <p>Payment Method: <strong style={{marginLeft: "5px"}}>
                   {order.paymentMethod === "UPI" ? "UPI (Online)" : "Cash On Delivery"}</strong>
                 </p>
@@ -95,15 +109,18 @@ function MyOrders() {
     disabled={
       order.orderStatus === "Cancelled" ||
       order.orderStatus === "Delivered" ||
+      order.deliveryStatus === "Delivered" ||
       !canCancelOrder(order.createdAt)
     }
     onClick={()=>cancelOrder(order._id)}
   >
     {order.orderStatus === "Cancelled"
-      ? "Cancelled"
-      : !canCancelOrder(order.createdAt)
-      ? "Cancel Expired"
-      : "Cancel Order"}
+    ? "Cancelled"
+    : order.orderStatus === "Delivered" || order.deliveryStatus === "Delivered"
+    ? "Delivered"
+    : !canCancelOrder(order.createdAt)
+    ? "Cancel Expired"
+    : "Cancel Order"}
   </button>
 
 </div>
