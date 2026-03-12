@@ -13,6 +13,7 @@ router.patch('/deleteProduct/:productId',authMiddlewares.protectRoutes,authMiddl
 router.get('/getOrders',authMiddlewares.protectRoutes,authMiddlewares.isVendor,vendorControllers.getVendorOrders);
 router.patch('/update_item_status',authMiddlewares.protectRoutes,authMiddlewares.isVendor,vendorControllers.updateItemStatus);
 router.get('/income',authMiddlewares.protectRoutes,authMiddlewares.isVendor,vendorControllers.getVendorMonthlyIncome);
-
+router.get("/shop-status",authMiddlewares.protectRoutes,authMiddlewares.isVendor,vendorControllers.getShopStatus);
+router.patch("/toggle-shop",authMiddlewares.protectRoutes,authMiddlewares.isVendor,vendorControllers.toggleShopStatus);
 
 module.exports=router;

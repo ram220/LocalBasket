@@ -62,7 +62,10 @@ const vendorSchema=new mongoose.Schema({
         required:[true,"address is a required field"],
         match:[/^[0-9]{10}$/],
     },
-    
+    isShopOpen:{
+        type:Boolean,
+        default:true
+    },
     role:{
         type:String,
         enum:["vendor","admin"],

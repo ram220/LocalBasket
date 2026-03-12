@@ -343,4 +343,62 @@ exports.updateItemStatus=async(req,res)=>{
 }
 
 
+// get shop status
+
+exports.getShopStatus = async (req,res)=>{
+  try{
+
+    const vendor = await Vendors.findById(req.user.id);
+
+    if(!vendor){
+      return res.status(404).json({
+        message:"Vendor not found"
+      })
+    }
+
+    res.status(200).json({
+      isShopOpen: vendor.isShopOpen
+    });
+
+  }catch(err){
+    res.status(500).json({
+      message:"Error fetching shop status",
+      error:err.message
+    })
+  }
+}
+
+// toggle vendor shop open / close
+
+exports.toggleShopStatus = async (req,res)=>{
+  try{
+
+    const vendorId = req.user.id;
+
+    const vendor = await Vendors.findById(vendorId);
+
+    if(!vendor){
+      return res.status(404).json({
+        message:"Vendor not found"
+      });
+    }
+
+    vendor.isShopOpen = !vendor.isShopOpen;
+
+    await vendor.save();
+
+    res.status(200).json({
+      message:"Shop status updated",
+      isShopOpen:vendor.isShopOpen
+    });
+
+  }catch(err){
+    res.status(500).json({
+      message:"Error updating shop status",
+      error:err.message
+    })
+  }
+}
+
+
 exports.upload=upload;

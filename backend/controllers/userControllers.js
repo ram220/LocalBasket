@@ -7,12 +7,14 @@ const calculateOffer=require('../utils/offersCheck');
 // all products from every vendor
 exports.getAllProducts=async(req,res)=>{
     try{
-        const products=await Products.find().populate("vendorId","name shopName category status");
+        const products=await Products.find().populate("vendorId","name shopName category status isShopOpen");
 
         const filteredProducts=products.filter(p=>p.vendorId && p.vendorId.status==="approved");
 //from this
         const finalProducts = filteredProducts.map(p => ({
             ...p.toObject(),
+            isShopOpen: p.vendorId?.isShopOpen,
+            shopName: p.vendorId?.shopName,
             ...calculateOffer(p)
         }));
 
@@ -38,7 +40,7 @@ exports.getSingleProduct=async(req,res)=>{
     try{
         const {productId}=req.params;
 
-        const product=await Products.findById(productId);
+        const product=await Products.findById(productId).populate("vendorId", "shopName isShopOpen");
 
         if(!product){
             return res.status(404).json({
@@ -49,6 +51,8 @@ exports.getSingleProduct=async(req,res)=>{
         // from this
         const finalProduct = {
             ...product.toObject(),   // 🔥 flatten
+            isShopOpen:product.vendorId?.isShopOpen,
+            shopName: product.vendorId?.shopName,
             ...calculateOffer(product)
         };
 
@@ -95,10 +99,12 @@ exports.getAllStores=async(req,res)=>{
 exports.getProductsByVendor=async(req,res)=>{
     try{
         const {vendorId}=req.params;
-        const products=await Products.find({vendorId});
+        const products=await Products.find({vendorId}).populate("vendorId", "shopName isShopOpen");
 
         const finalProducts=products.map(p=>({
             ...p.toObject(),
+            isShopOpen: p.vendorId?.isShopOpen,
+            shopName: p.vendorId?.shopName,
             ...calculateOffer(p)
         }))
 
@@ -126,21 +132,32 @@ exports.getRecomendedProducts=async(req,res)=>{
 
         if(!currentProduct) return res.status(400).json({status:"fail",message:"product not found"});
 
-        const recommendedProducts = await Products.aggregate([
+        /*const recommendedProducts = await Products.aggregate([
             { $match: {
                 category: currentProduct.category,
                 _id : { $ne : currentProduct._id},
                 inStock: true
             }},
             { $sample : {size : 4}}
-        ]);
+        ]);*/
 
-        /*const finalProducts = recommendedProducts.map(p=>({
-            ...p.toObject,
+        const recommendedProducts = await Products.find({
+    category: currentProduct.category,
+    _id: { $ne: currentProduct._id },
+    inStock: true
+})
+.populate("vendorId","shopName isShopOpen")
+.limit(4);
+
+
+        const finalProducts = recommendedProducts.map(p=>({
+            ...p.toObject(),
+            isShopOpen: p.vendorId?.isShopOpen,
+            shopName: p.vendorId?.shopName,
             ...calculateOffer(p)
-        }))*/
+        }))
 
-        res.status(200).json({recommendedProducts});
+        res.status(200).json({recommendedProducts:finalProducts});
     }
     catch(err){
         res.status(500).json({ message: "Server error" });
@@ -165,7 +182,7 @@ exports.searchedProduct=async(req,res)=>{
                 { name: { $regex: query,$options: 'i'}},
                 {category: {$regex:query,$options:'i'}},
                 { keywords: { $elemMatch: { $regex: query, $options: "i" } } }            ]
-        }).populate("vendorId", "name shopName status");
+        }).populate("vendorId", "name shopName status isShopOpen");
 
         const filteredProducts = products.filter(
             prod=>prod.vendorId && prod.vendorId.status === "approved"
@@ -173,6 +190,8 @@ exports.searchedProduct=async(req,res)=>{
 
         const finalProducts = filteredProducts.map(p => ({
             ...p.toObject(),
+            isShopOpen: p.vendorId?.isShopOpen,
+            shopName: p.vendorId?.shopName,
             ...calculateOffer(p)
         }));
         res.status(200).json({
@@ -224,7 +243,7 @@ exports.getOfferProducts = async(req,res)=>{
                 $lte:threeDaysLater
             },
             inStock:true
-        }).populate("vendorId", "name shopName status");
+        }).populate("vendorId", "name shopName status isShopOpen");
 
         const filtered = products.filter(
             prod=>prod.vendorId.status === "approved"
@@ -232,6 +251,8 @@ exports.getOfferProducts = async(req,res)=>{
 
         const offers = filtered.map(p=>({
             ...p.toObject(),
+            isShopOpen: p.vendorId?.isShopOpen,
+            shopName: p.vendorId?.shopName,
             ...calculateOffer(p)
         }));
 

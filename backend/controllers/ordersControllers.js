@@ -2,7 +2,7 @@ const Orders=require('../models/ordersModel');
 const Cart=require('../models/cartModel');
 const calculateOffer=require('../utils/offersCheck');
 const razopay=require('../config/razorpay');
-
+const Vendors=require('../models/vendorModel');
 
 exports.placeOrder = async(req,res)=>{
     try{
@@ -20,7 +20,40 @@ if (!cart || cart.items.length === 0) {
 
 let itemsTotal = 0;
 
-const updatedItems = cart.items.map(item => {
+// from here 
+
+const updatedItems = [];
+
+for(const item of cart.items){
+
+    const product = item.productId;
+
+    const vendor = await Vendors.findById(product.vendorId);
+
+    if(!vendor.isShopOpen){
+        return res.status(403).json({
+            message:`${vendor.shopName} shop is currently closed`
+        });
+    }
+
+    const offerData = calculateOffer(product);
+    const finalPrice = offerData.finalPrice || product.price;
+
+    itemsTotal += finalPrice * item.quantity;
+
+    updatedItems.push({
+        productId: product._id,
+        name: product.name,
+        quantity: item.quantity,
+        price: finalPrice,
+        image: product.image,
+        vendorId: product.vendorId
+    });
+}
+
+// to here
+
+/*const updatedItems = cart.items.map(item => {
     const offerData = calculateOffer(item.productId);
     const finalPrice = offerData.finalPrice || item.productId.price;
 
@@ -34,7 +67,7 @@ const updatedItems = cart.items.map(item => {
         image: item.productId.image,
         vendorId: item.productId.vendorId
     };
-});
+});*/
 
 const deliveryCharge = 0; // or your logic
 const totalAmount = itemsTotal + deliveryCharge;
