@@ -8,8 +8,8 @@ import { useOutletContext } from "react-router-dom";
 function ProductDetails() {
   const { productId } = useParams();
 
-  //const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
-  const API_URL = "http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  //const API_URL = "http://localhost:8000";
 
   const {fetchCart} = useOutletContext();
 

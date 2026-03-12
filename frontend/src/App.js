@@ -32,8 +32,8 @@ import AgentOrders from './pages/deliveryPartnerPages/AgentOrders';
 
 function App() {
 
-  //const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-  const API_URL="http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
+  //const API_URL="http://localhost:8000";
 
 const [isLoggedIn, setIsLoggedIn] = useState(() => {
   const token = localStorage.getItem("token");

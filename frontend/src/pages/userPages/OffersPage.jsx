@@ -7,8 +7,8 @@ function OffersPage() {
   const [offers, setOffers] = useState([]);
   const navigate = useNavigate();
 
-  //const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
-  const API_URL = "http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  //const API_URL = "http://localhost:8000";
 
   useEffect(() => {
     const fetchOffers = async () => {

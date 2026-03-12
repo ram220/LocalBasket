@@ -16,8 +16,8 @@ function VendorRegister() {
     mobile:""
   });
 
-  //const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-  const API_URL="http://localhost:8000";
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
+  //const API_URL="http://localhost:8000";
 
   const [errors,setErrors]=useState({});
 

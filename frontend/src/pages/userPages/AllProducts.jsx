@@ -10,9 +10,9 @@ function AllProducts() {
   const [category, setCategory] = useState("all");
   const [shopClosedMsg,setShopClosedMsg]=useState("");
 
-  //const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
 
-  const API_URL = "http://localhost:8000";
+  //const API_URL = "http://localhost:8000";
 
   const {fetchCart} = useOutletContext();
 

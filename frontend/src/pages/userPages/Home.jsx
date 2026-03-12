@@ -7,9 +7,9 @@ import { useNavigate } from 'react-router-dom';
 function Home(){
     const [stores,setStores]=useState([]);
 
-    //const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
 
-    const API_URL="http://localhost:8000"
+    //const API_URL="http://localhost:8000"
 
     const navigate=useNavigate();
 

@@ -5,9 +5,9 @@ function VendorTopNavbar({logoutUser}) {
     const [isLoggedIn,setIsLoggedIn]=useState(false);
     const [shopOpen,setShopOpen] = useState(true);
 
-    //const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
+    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
 
-    const API_URL="http://localhost:8000";
+    //const API_URL="http://localhost:8000";
 
     const navigate=useNavigate()
 
