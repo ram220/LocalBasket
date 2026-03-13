@@ -57,7 +57,7 @@ exports.approveVendor=async(req,res)=>{
 
         vendor.trialStartDate=new Date();
 
-        vendor.trialEndDate=new Date(Date.now() + 1*24*60*60*1000);
+        vendor.trialEndDate=new Date(Date.now() + 0*24*60*60*1000);
 
         await vendor.save();
 

@@ -147,28 +147,25 @@ exports.updateProduct=async(req,res)=>{
 exports.deleteProduct=async(req,res)=>{
     try{
         const {productId}=req.params;
+        console.log(productId)
         const vendorId=req.user.id;
 
-        const product=await Products.findOne({
-            _id:productId,
-            vendorId:vendorId,
-        })
+        const deletedProduct=await Products.findByIdAndDelete(productId);
 
-        if(!product){
+        if(!deletedProduct){
             return res.status(404).json({
                 status:"fail",
                 message:"product not found or not authorized"
             });
         }
 
-        const deletedProduct=await Products.findByIdAndDelete(productId)
-
-        res.status(204).json({
+        res.status(200).json({
             status:"success",
             message:"product deleted"
         })
     }
     catch(err){
+        console.log(err);
         res.status(500).json({
             message:"error while deleting product",
             err:err.message

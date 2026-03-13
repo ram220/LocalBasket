@@ -87,12 +87,24 @@ exports.getSubscriptionStatus = async (req,res)=>{
 
         let daysLeft = 0;
 
-        if(vendor.subscriptionStatus==="trial"){
-            daysLeft = Math.max(0,Math.ceil((vendor.trialEndDate - today)/(1000*60*60*24)))
+        if(vendor.subscriptionStatus==="trial" && vendor.trialEndDate){
+            daysLeft = Math.max(0,Math.ceil((vendor.trialEndDate - today)/(1000*60*60*24)));
+
+            if(daysLeft<=0){
+                vendor.subscriptionStatus="expired";
+                await vendor.save();
+                daysLeft=0;
+            }
         }
 
-        if(vendor.subscriptionStatus==="active"){
+        if(vendor.subscriptionStatus==="active" && vendor.subscriptionEndDate){
             daysLeft = Math.max(0,Math.ceil((vendor.subscriptionEndDate - today)/(1000*60*60*24)))
+
+            if(daysLeft<=0){
+                vendor.subscriptionStatus="expired";
+                await vendor.save();
+                daysLeft=0;
+            }
         }
 
         res.json({
