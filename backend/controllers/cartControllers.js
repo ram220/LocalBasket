@@ -1,6 +1,8 @@
 const Cart = require("../models/cartModel");
 const Products = require("../models/productsModel");
 const calculateOffer = require('../utils/offersCheck');
+const Vendors=require('../models/vendorModel')
+
 //add to cart
 
 exports.addToCart=async(req,res)=>{
@@ -10,9 +12,6 @@ exports.addToCart=async(req,res)=>{
 
 
         const product=await Products.findById(productId);
-//this 2 lines
-        const offerData = calculateOffer(product);
-const finalPrice = offerData.finalPrice || product.price;
 
         if(!product){
             return res.status(404).json({
@@ -20,6 +19,31 @@ const finalPrice = offerData.finalPrice || product.price;
                 message:"Product not found"
             });
         }
+
+        const vendor=await Vendors.findById(product.vendorId);
+
+        if(!vendor){
+            return res.status(404).json({
+
+                message:"Vendor not found"
+            });
+        }
+
+        if(vendor.subscriptionStatus==="expired"){
+            return res.status(403).json({
+                message:"Shop is temporarily out of service (vendor plan expired)";
+            });
+        }
+
+        if(!vendor.isShopOpen){
+            return res.status(403).json({
+                message:"Shop is currently closed"
+            })
+        }
+
+        //this 2 lines
+        const offerData = calculateOffer(product);
+        const finalPrice = offerData.finalPrice || product.price;
 
         let cart=await Cart.findOne({userId});
 
