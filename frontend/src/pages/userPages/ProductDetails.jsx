@@ -89,11 +89,19 @@ function ProductDetails() {
 
         <div className="col-md-7">
           <h2>{product.name}</h2>
-          {!product.isShopOpen && (
+          
+{product.subscriptionStatus === "expired" && (
+  <p style={{color:"red", fontWeight:"600"}}>
+    Shop Temporarily Out of Service
+  </p>
+)}
+
+{product.subscriptionStatus !== "expired" && !product.isShopOpen && (
   <p style={{color:"red", fontWeight:"600"}}>
     Shop is currently closed
   </p>
 )}
+
           {/*
           <h4 className="text-success">
                       ₹{" "}
@@ -142,7 +150,7 @@ function ProductDetails() {
             <p className="mt-3">{product.description}</p>
           )}
 
-          {product.isShopOpen && (
+          {product.isShopOpen && product.subscriptionStatus!=="expired" && (
   product.inStock ? (
     <button
       className="btn btn-secondary btn-sm mt-3"

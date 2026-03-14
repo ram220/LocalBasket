@@ -37,9 +37,13 @@ function AllProducts() {
 
   // add items to cart
 
-  const addToCart=async(productId)=>{
+  const addToCart=async(productId,product)=>{
     if(!token){
       alert("please login to add items to cart");
+      return;
+    }
+    if(product.subscriptionStatus==="expired"){
+      alert("Shop is temporarily out of service");
       return;
     }
     try{
@@ -92,18 +96,28 @@ function AllProducts() {
             <div key={p._id} className="product-card">
               
 
-              <button className="plus-btn" disabled={!p.inStock || !p.isShopOpen}
-                style={{opacity: (!p.inStock || !p.isShopOpen) ? 0.5 : 1,
-                  cursor: (!p.inStock || !p.isShopOpen) ? "not-allowed" : "pointer"
+              <button className="plus-btn" disabled={!p.inStock || !p.isShopOpen || p.subscriptionStatus==="expired"}
+                style={{opacity: (!p.inStock || !p.isShopOpen || p.subscriptionStatus==="expired") ? 0.5 : 1,
+                  cursor: (!p.inStock || !p.isShopOpen || p.subscriptionStatus==="expired") ? "not-allowed" : "pointer"
                 }}
-                onClick={()=>addToCart(p._id)}>+
+                onClick={()=>addToCart(p._id,p)}>+
               </button>
 
               <div className="product-image-container">
 
                   <img src={p.image} className="product-img" alt={p.name} />
 
-                  {!p.isShopOpen && (<div className="shop-closed-badge">Shop Closed</div>)}
+{p.subscriptionStatus === "expired" && (
+  <div className="shop-closed-badge">
+    Shop Temporarily Out of Service
+  </div>
+)}
+
+{p.subscriptionStatus !== "expired" && !p.isShopOpen && (
+  <div className="shop-closed-badge">
+    Shop Closed
+  </div>
+)}
               </div>
 
               <div className="card-body d-flex flex-column">

@@ -90,7 +90,7 @@ function SearchedPage() {
                 {/* Add to Cart */}
                 <button
                   className="plus-btn"
-                  disabled={!item.inStock || !item.isShopOpen}
+                  disabled={!item.inStock || !item.isShopOpen || item.subscriptionStatus==="expired"}
                   onClick={() => addToCart(item._id, item)}
                   style={{
                     opacity: (!item.inStock || !item.isShopOpen) ? 0.5 : 1,

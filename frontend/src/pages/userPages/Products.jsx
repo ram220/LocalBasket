@@ -77,7 +77,7 @@ function Products() {
 
                   <button
                       className="btn btn-sm w-100"
-                      disabled={!p.inStock || !p.isShopOpen}
+                      disabled={!p.inStock || !p.isShopOpen || p.subscriptionStatus==="expired"}
                       onClick={()=>addToCart(p._id,p)}
                       style={{
                         background: "rgb(255, 106, 0)",
