@@ -181,7 +181,7 @@ function OrderSummary({ cart,setCart }) {
 
   <div className="d-flex justify-content-between mt-1">
     <small><strong>Total</strong></small>
-    {itemsTotal<200 && (<small style={{color:"red"}}>Minimum order amount should be ₹200</small>)}
+    {itemsTotal<200 ? (<small style={{color:"red"}}>Minimum order amount should be ₹200</small>) : <small><strong>{total}</strong></small>}
   </div>
 </div>
 
