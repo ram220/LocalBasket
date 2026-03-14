@@ -31,7 +31,7 @@ exports.addToCart=async(req,res)=>{
 
         if(vendor.subscriptionStatus==="expired"){
             return res.status(403).json({
-                message:"Shop is temporarily out of service (vendor plan expired)";
+                message:"Shop is temporarily out of service (vendor plan expired)"
             });
         }
 
