@@ -96,7 +96,7 @@ function SubscriptionStatus() {
         <div>
           <p style={{color:"red"}}>Your subscription expired. Please renew.</p>
           <button onClick={renewPlan} className="btn btn-warning">
-            Renew Plan ₹300
+            Renew Plan ₹1500
           </button>
         </div>
       )}

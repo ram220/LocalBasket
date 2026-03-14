@@ -14,7 +14,7 @@ function OrderSummary({ cart,setCart }) {
 
   const [paymentMethod,setPaymentMethod] = useState("COD");
 
-  const DELIVERY_CHARGE = 0;
+  const DELIVERY_CHARGE = 15;
 
   const token=localStorage.getItem("token");
 
@@ -49,6 +49,11 @@ function OrderSummary({ cart,setCart }) {
     if(cart.length === 0){
         alert("Cart is empty, add items to cart and try");
         return;
+    }
+
+    if(itemsTotal<200){
+      alert("Minimum order amount is ₹200");
+      return;
     }
 
     const orderData = {
@@ -176,7 +181,7 @@ function OrderSummary({ cart,setCart }) {
 
   <div className="d-flex justify-content-between mt-1">
     <small><strong>Total</strong></small>
-    <small><strong>₹{total}</strong></small>
+    {itemsTotal<200 && (<small style={{color:"red"}}>Minimum order amount should be ₹200</small>)}
   </div>
 </div>
 
