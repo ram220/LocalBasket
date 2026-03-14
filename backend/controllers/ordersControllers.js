@@ -14,42 +14,42 @@ exports.placeOrder = async(req,res)=>{
        const {paymentMethod,paymentStatus}=req.body;
        const cart = await Cart.findOne({ userId }).populate("items.productId");
 
-if (!cart || cart.items.length === 0) {
-    return res.status(400).json({ message: "Cart is empty" });
-}
+    if (!cart || cart.items.length === 0) {
+        return res.status(400).json({ message: "Cart is empty" });
+    }
 
-let itemsTotal = 0;
+    let itemsTotal = 0;
 
 // from here 
 
-const updatedItems = [];
+    const updatedItems = [];
 
-for(const item of cart.items){
+    for(const item of cart.items){
 
-    const product = item.productId;
+        const product = item.productId;
 
-    const vendor = await Vendors.findById(product.vendorId);
+        const vendor = await Vendors.findById(product.vendorId);
 
-    if(!vendor.isShopOpen){
-        return res.status(403).json({
-            message:`${vendor.shopName} shop is currently closed`
+        if(!vendor.isShopOpen){
+            return res.status(403).json({
+                message:`${vendor.shopName} shop is currently closed`
+            });
+        }
+
+        const offerData = calculateOffer(product);
+        const finalPrice = offerData.finalPrice || product.price;
+
+        itemsTotal += finalPrice * item.quantity;
+
+        updatedItems.push({
+            productId: product._id,
+            name: product.name,
+            quantity: item.quantity,
+            price: finalPrice,
+            image: product.image,
+            vendorId: product.vendorId
         });
     }
-
-    const offerData = calculateOffer(product);
-    const finalPrice = offerData.finalPrice || product.price;
-
-    itemsTotal += finalPrice * item.quantity;
-
-    updatedItems.push({
-        productId: product._id,
-        name: product.name,
-        quantity: item.quantity,
-        price: finalPrice,
-        image: product.image,
-        vendorId: product.vendorId
-    });
-}
 
 // to here
 
@@ -69,8 +69,14 @@ for(const item of cart.items){
     };
 });*/
 
-const deliveryCharge = 0; // or your logic
-const totalAmount = itemsTotal + deliveryCharge;
+    const deliveryCharge = 15; // or your logic
+    const totalAmount = itemsTotal + deliveryCharge;
+
+    if(itemsTotal<200){
+        return res.status(400).json({
+            message:"Minimum order amount is ₹200"
+        })
+    }
 
 // upto here
         const newOrder=await Orders.create({
