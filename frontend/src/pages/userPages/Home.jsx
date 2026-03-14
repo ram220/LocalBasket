@@ -62,9 +62,15 @@ function Home(){
                                     alt={s.name}
                                 />
 
-                                {!s.isShopOpen && (
+                                {s.subscriptionStatus === "expired" && (
                                     <div className="store-closed-banner">
-                                    Shop Closed
+                                        Store Temporarily Out of Service
+                                    </div>
+                                )}
+
+                                {s.subscriptionStatus !== "expired" && !s.isShopOpen && (
+                                    <div className="store-closed-banner">
+                                        Shop Closed
                                     </div>
                                 )}
 
