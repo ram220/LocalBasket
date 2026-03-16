@@ -2,6 +2,7 @@ const Vendors = require("../models/vendorModel");
 const Orders=require('../models/ordersModel');
 const DeliveryAgent = require("../models/deliveryAgentModel");
 const bcrypt=require('bcrypt');
+const sendEmail=require('../utils/sendEmail');
 
 exports.getAllVandors=async(req,res)=>{
     try{
@@ -363,6 +364,7 @@ exports.getApprovedAgents=async(req,res)=>{
         });
     }
     catch(err){
+        console.log(err);
         res.status(500).json({
             message:"Error while fetching approved agents",
             err:err.message
