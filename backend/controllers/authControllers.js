@@ -445,12 +445,12 @@ exports.forgotPassword = async (req, res) => {
 
         const resetLink = `${process.env.DEPLOYED_URL}/reset-password/${resetToken}/${role}`;
 
-        res.json({ message: "Reset link sent to email" });
-        await sendEmail(
+        sendEmail(
             user.email,
             "Reset Your Password",
             `Click here:\n${resetLink}`
         );
+        res.json({ message: "Reset link sent to email" });
 
 
     } catch (err) {
