@@ -4,8 +4,9 @@ import axios from 'axios';
 
 function ForgotPassword() {
   const [email,setEmail]=useState("");
-  const [role,setRole]=useState("user"); // ✅ FIX
+  const [role,setRole]=useState("user");
   const [message,setMessage]=useState("");
+  const [loading,setLoading]=useState(false);
 
   const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
   //const API_URL="http://localhost:8000";
@@ -18,6 +19,7 @@ function ForgotPassword() {
     e.preventDefault();
 
     try{
+      setLoading(true);
       const res = await axios.post(`${API_URL}/api/auth/forgot-password`,{
         email,
         role
@@ -27,6 +29,9 @@ function ForgotPassword() {
     }
     catch(err){
       setMessage(err.response?.data.message || "Something went wrong");
+    }
+    finally{
+      setLoading(false);
     }
   };
 
@@ -53,8 +58,8 @@ function ForgotPassword() {
               <option value="admin">Admin</option>
             </select>
 
-          <button className="btn auth-btn w-100" style={{ background: "rgb(252, 107, 3)", color: "#fff" }}>
-            Send Reset Link
+          <button className="btn auth-btn w-100" style={{ background: "rgb(252, 107, 3)", color: "#fff" }} disabled={loading}>
+            {loading?"Sending...":"Send Reset Link"}
           </button>
         </form>
 
