@@ -443,7 +443,7 @@ exports.forgotPassword = async (req, res) => {
 
         await user.save();
 
-        const resetLink = `http://localhost:3000/reset-password/${resetToken}/${role}`;
+        const resetLink = `${process.env.DEPLOYED_URL}/reset-password/${resetToken}/${role}`;
 
         res.json({ message: "Reset link sent to email" });
         await sendEmail(
