@@ -52,10 +52,8 @@ function VendorRegister() {
 
   }
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-12 col-sm-10 col-md-7 col-lg-5">
-          <div className="card p-4 shadow-sm">
+    <div className="auth-container">
+          <div className="card auth-card p-4 shadow">
             <h3 className="text-center mb-3" style={{ color: "rgb(252, 107, 3)" }}>
               Register as Vendor
             </h3>
@@ -123,8 +121,7 @@ function VendorRegister() {
               Already have an account? <Link to="/login">Login</Link>
             </p>
           </div>
-        </div>
-      </div>
+        
     </div>
   );
 }

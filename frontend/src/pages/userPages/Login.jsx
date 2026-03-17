@@ -50,7 +50,7 @@ function Login({setIsLoggedIn,fetchCart}) {
       //redirect base on role
       if(role === "user") navigate("/");
       else if(role === "vendor") navigate("/vendor");
-      else if(role==="delivery_agent") navigate("/agent")
+      else if(role==="delivery_agent") navigate("/agent/dashboard")
       else navigate("/admin");
     }
     catch(err){
@@ -59,10 +59,8 @@ function Login({setIsLoggedIn,fetchCart}) {
 
   }
   return (
-    <div className="container mt-5">
-      <div className="row justify-content-center">
-        <div className="col-12 col-sm-10 col-md-6 col-lg-4">
-          <div className="card p-4 shadow-sm">
+    <div className="auth-container">
+          <div className="card auth-card p-4 shadow">
             <h2 className="text-center mb-3" style={{ color: "rgb(252, 107, 3)" }}>
               Login
             </h2>
@@ -81,6 +79,12 @@ function Login({setIsLoggedIn,fetchCart}) {
               </div>
               {errors.password && <p className="text-danger">{errors.password}</p>}
 
+              <div className="mb-2 text-end">
+                <Link to="/forgot-password" style={{fontSize:"14px"}}>
+                  Forgot Password?
+                </Link>
+              </div>
+
               <div className="mb-3">
                 <label>Login as</label>
                 <select className="form-select" value={role} onChange={(e)=>setRole(e.target.value)}>
@@ -91,22 +95,21 @@ function Login({setIsLoggedIn,fetchCart}) {
                 </select>
               </div>
 
-              <button className="btn w-100" style={{ background: "rgb(252, 107, 3)", color: "#fff" }}>
+              <button className="btn auth-btn w-100" style={{ background: "rgb(252, 107, 3)", color: "#fff" }}>
                 Login
               </button>
             </form>
 
             <div className="mt-3 text-center">
               <p>Don't have an account?</p>
-              <div className="d-flex justify-content-around">
+              <div className="d-flex gap-2 justify-content-center flex-wrap">
                 <Link to="/register-user" className="btn btn-outline-primary btn-sm">User</Link>
                 <Link to="/register-vendor" className="btn btn-outline-success btn-sm">Vendor</Link>
+                <Link to="/register-agent" className="btn btn-outline-warning btn-sm">Delivery Agent</Link>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
   );
 }
 

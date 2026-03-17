@@ -29,6 +29,11 @@ import AddDeliveryAgent from './pages/adminPages/AddDeliveryAgent';
 import ManageAgents from './pages/adminPages/ManageAgents';
 import DeliveryAgentLayout from './layouts/DeliveryAgentLayout';
 import AgentOrders from './pages/deliveryPartnerPages/AgentOrders';
+import RegisterDeliveryAgent from './pages/deliveryPartnerPages/AgentRegister';
+import ForgotPassword from './pages/userPages/ForgotPassword';
+import './App.css'
+import ResetPassword from './pages/userPages/ResetPassword';
+import AgentDashboard from './pages/deliveryPartnerPages/AgentDashboard';
 
 function App() {
 
@@ -114,6 +119,9 @@ const logoutUser = () => {
           <Route path="/login" element={<Login setIsLoggedIn={setIsLoggedIn} fetchCart={fetchCart}/>}/>
           <Route path="/register-user" element={<UserRegister/>}/>
           <Route path="/register-vendor" element={<VendorRegister/>}/>
+          <Route path="/register-agent" element={<RegisterDeliveryAgent/>}/>
+          <Route path='/forgot-password' element={<ForgotPassword/>}/>
+          <Route path="/reset-password/:token/:role" element={<ResetPassword/>}/>
           <Route path="/store/:id" element={<Products/>}/>
           <Route path="/products" element={<AllProducts/>}/>
           <Route path="/product_details/:productId" element={<ProductDetails/>}/>
@@ -145,7 +153,7 @@ const logoutUser = () => {
 
           <Route path="vendors" element={<VendorsManagement/>}/>
           <Route path="orders" element={<AdminOrders/>}/>
-          <Route path='add_agent' element={<AddDeliveryAgent/>}/>
+          {/*<Route path='add_agent' element={<AddDeliveryAgent/>}/>*/}
           <Route path='agents' element={<ManageAgents/>}/>
 
         </Route>
@@ -154,7 +162,7 @@ const logoutUser = () => {
           element={isLoggedIn && localStorage.getItem("role")==="delivery_agent"
             ? <DeliveryAgentLayout logoutUser={logoutUser}/>
             : <Login setIsLoggedIn={setIsLoggedIn}/>}>
-
+              <Route path="dashboard" element={<AgentDashboard/>}/>
               <Route path='orders' element={<AgentOrders/>}/>
 
 

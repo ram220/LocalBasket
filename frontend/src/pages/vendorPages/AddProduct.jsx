@@ -15,6 +15,8 @@ function AddProduct() {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
 
+  const [loading, setLoading] = useState(false);
+
   const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
   //const API_URL="http://localhost:8000";
 
@@ -24,6 +26,8 @@ function AddProduct() {
 
   const handleSubmit=async(e)=>{
     e.preventDefault();
+    if(loading) return;
+    setLoading(true);
     try{
       const token=localStorage.getItem("token");
       const data = new FormData();
@@ -51,6 +55,9 @@ function AddProduct() {
     catch(err){
       const message=err.response?.data.message;
       alert(message);
+    }
+    finally{
+      setLoading(false);
     }
   }
   return (
@@ -173,17 +180,26 @@ function AddProduct() {
           <button
             className="mt-3"
             type="submit"
+            disabled={loading}
             style={{
               padding: "8px 16px",
               marginTop: "10px",
-              backgroundColor: "rgb(255, 107, 2)",
+              backgroundColor: loading ? "#ccc" :"rgb(255, 107, 2)",
               border: "none",
               borderRadius: "3px",
               color: "white",
-             
+              cursor: loading ? "not-allowed" : "pointer"
             }}
           >
-            Add
+            {/*{loading ? "Uploading..." : "Add"}*/}
+            {loading ? (
+  <>
+    <span className="spinner-border spinner-border-sm me-2"></span>
+    Uploading...
+  </>
+) : (
+  "Add"
+)}
           </button>
         </form>
       </div>
