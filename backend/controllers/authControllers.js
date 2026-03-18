@@ -423,6 +423,7 @@ const getModel = (role) => {
 exports.forgotPassword = async (req, res) => {
     try {
         const { email, role } = req.body;
+        console.log(email,role);
 
         const Model = getModel(role);
 
@@ -435,6 +436,7 @@ exports.forgotPassword = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: "Account not found" });
         }
+        console.log(user)
 
         const resetToken = crypto.randomBytes(32).toString("hex");
 
