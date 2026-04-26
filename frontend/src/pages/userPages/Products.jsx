@@ -2,15 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
+import API_URL from "../../config";
 
 function Products() {
   const { id } = useParams();
   const [products, setProducts] = useState([]);
 
   const {fetchCart} = useOutletContext();
-  
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
-  //const API_URL = "http://localhost:8000";
 
   const token=localStorage.getItem("token");
   useEffect(() => {

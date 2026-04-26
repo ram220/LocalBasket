@@ -10,12 +10,11 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import API_URL from "../../config";
+
 function TotalIncome() {
   const [data, setData] = useState([]);
   const [totalIncome, setTotalIncome] = useState(0);
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-  //const API_URL = "http://localhost:8000";
   const token = localStorage.getItem("token");
 
   useEffect(() => {

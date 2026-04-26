@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../../config";
 
 function SubscriptionStatus() {
-
   const [subscription,setSubscription]=useState(null);
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-
-  //const API_URL="http://localhost:8000";
 
   const token=localStorage.getItem("token");
   useEffect(()=>{

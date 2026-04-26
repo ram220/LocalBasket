@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
+import API_URL from "../../config";
 
 function RegisterDeliveryAgent() {
   const [formData, setFormData] = useState({
@@ -14,9 +15,6 @@ function RegisterDeliveryAgent() {
   });
 
   const [loading, setLoading] = useState(false);
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-  //const API_URL = "http://localhost:8000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();

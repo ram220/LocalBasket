@@ -1,6 +1,8 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./Chatbot.css";
 
+import API_URL from "../../config";
+
 function Chatbot({setCart}) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -8,9 +10,6 @@ function Chatbot({setCart}) {
   ]);
   const [input, setInput] = useState("");
   const messagesEndRef = useRef(null);
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
-  //const API_URL = "http://localhost:8000";
 
   // Auto scroll to bottom
   useEffect(() => {

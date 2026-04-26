@@ -1,13 +1,11 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../../config";
 
 function ViewOrders() {
     const [orders,setOrders]=useState([]);
     const [currentPage,setCurrentPage]=useState(1)
     const [totalPages,setTotalPages]=useState(1);
-
-    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-    //const API_URL = "http://localhost:8000";
     const token=localStorage.getItem("token");
 
     useEffect(()=>{

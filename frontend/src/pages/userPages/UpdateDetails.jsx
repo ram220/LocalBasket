@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../../config";
 
 function ChangeAddress() {
   const [address, setAddress] = useState("");
@@ -8,9 +9,6 @@ function ChangeAddress() {
   const navigate = useNavigate();
 
   const token=localStorage.getItem("token");
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
-  //const API_URL = "http://localhost:8000";
 
   // Fetch current details
   useEffect(() => {

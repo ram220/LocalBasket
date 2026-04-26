@@ -7,11 +7,10 @@ function VendorLayout({logoutUser}) {
   return (
     <>
         <VendorTopNavbar logoutUser={logoutUser}/>
-        <div style={{ display: "flex" }}>
-                <VendorSideNavbar />
-                <main style={{ flex: 1, padding: "20px",}}>
+        <div className="main-layout-container">
+                <main style={{ flex: 1, padding: "20px", minWidth: 0 }}>
                   <SubscriptionStatus/>
-                    <Outlet /> {/* renders AddProducts, ViewProducts, etc. */}
+                    <Outlet />
                 </main>
             </div>
     </>

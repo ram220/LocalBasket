@@ -8,10 +8,8 @@ function AdminLayout({logoutUser}){
         <>
 
         <AdminTopNavbar logoutUser={logoutUser}/>
-
-        <div style={{display:"flex"}}>
-            <AdminSideNavbar/>
-            <main style={{flex:1,padding:"20px"}}>
+        <div className="main-layout-container">
+            <main style={{flex:1,padding:"20px", minWidth: 0}}>
                 <Outlet/>
             </main>
         </div>

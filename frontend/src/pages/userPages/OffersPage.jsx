@@ -2,13 +2,11 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import './AllProducts.css'; // use your existing styles
+import API_URL from "../../config";
 
 function OffersPage() {
   const [offers, setOffers] = useState([]);
   const navigate = useNavigate();
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
-  //const API_URL = "http://localhost:8000";
 
   useEffect(() => {
     const fetchOffers = async () => {

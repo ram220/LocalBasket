@@ -4,15 +4,12 @@ import Footer from "../../components/userComponents/Footer";
 import "./AllProducts.css";
 import { useOutletContext } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import API_URL from "../../config";
 
 function AllProducts() {
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("all");
   const [shopClosedMsg,setShopClosedMsg]=useState("");
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
-
-  //const API_URL = "http://localhost:8000";
 
   const {fetchCart} = useOutletContext();
 
@@ -78,16 +75,18 @@ function AllProducts() {
         </h2>
 
         {/* 🔥 CATEGORY FILTER */}
-        <div className="products-filter">
-          {["all", "Grocery", "Junk Foods", "Medical", "Bakery","Sweets","Fruits & Juices"].map((cat) => (
-            <button
-              key={cat}
-              className="products-btn"
-              onClick={() => setCategory(cat)}
-            >
-              {cat}
-            </button>
-          ))}
+        <div className="products-filter-wrapper">
+          <div className="products-filter">
+            {["all", "Grocery", "Junk Foods", "Medical", "Bakery","Sweets","Fruits & Juices"].map((cat) => (
+              <button
+                key={cat}
+                className={`category-pill ${category === cat ? 'active' : ''}`}
+                onClick={() => setCategory(cat)}
+              >
+                {cat.charAt(0).toUpperCase() + cat.slice(1)}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 🔥 PRODUCTS GRID */}

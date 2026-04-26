@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import API_URL from "../../config";
 
 function ResetPassword() {
   const { token, role } = useParams();
@@ -11,9 +12,6 @@ function ResetPassword() {
   const [message, setMessage] = useState("");
 
   const [loading,setLoading]=useState(false)
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-  //const API_URL = "http://localhost:8000";
 
   const handleSubmit = async (e) => {
     e.preventDefault();

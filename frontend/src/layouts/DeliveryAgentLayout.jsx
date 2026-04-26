@@ -9,9 +9,8 @@ function DeliveryAgentLayout({logoutUser}){
 
             <AgentTopNavbar logoutUser={logoutUser}/>
             
-            <div style={{display:"flex"}}>
-                <AgentSideNavbar/>
-                <main style={{flex:1,padding:"20px"}}>
+            <div className="main-layout-container">
+                <main style={{flex:1,padding:"20px", minWidth: 0}}>
                     <Outlet/>
                 </main>
             </div>

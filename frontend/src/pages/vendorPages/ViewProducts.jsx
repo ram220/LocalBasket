@@ -1,13 +1,11 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import API_URL from "../../config";
 
 function ViewProducts() {
     const [products,setProducts]=useState([]);
     const [page, setPage] = useState(1);
     const [totalPages,setTotalPages]=useState(1);
-
-    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-    //const API_URL="http://localhost:8000";
 
     const token=localStorage.getItem("token");
 
@@ -83,74 +81,76 @@ function ViewProducts() {
     }
 
   return (
-    <div className="p-3">
-      <h5>All Products</h5>
-      <div
-        className="container ms-0 p-2"
-        style={{
-          backgroundColor: "whitesmoke",
-          width: "700px",
-          minHeight: "400px",
-        }}
-      >
-        {/* Headers */}
-        <div
-          className="d-flex p-2"
-          style={{ fontWeight: "bold", borderBottom: "1px solid #ccc" }}
-        >
-          <div style={{ flex: 2 }}>Product</div>
-          <div style={{ flex: 1 }}>Category</div>
-          <div style={{ flex: 1 }}>Price</div>
-          <div style={{ flex: 1 }}>In Stock</div>
-          <div style={{flex:1}}>Action</div>
+    <div className="container-fluid py-4 h-100">
+      <div className="card shadow-sm p-3 p-md-4 border-0" style={{ backgroundColor: "#fff", borderRadius: "16px" }}>
+        <h4 className="fw-bold mb-4" style={{ color: "rgb(252, 107, 3)" }}>Product Management</h4>
+        
+        <div className="table-responsive">
+          <table className="table table-hover align-middle">
+            <thead className="table-light">
+              <tr>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>In Stock</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {products.map((p) => (
+                <tr key={p._id}>
+                  {/* product */}
+                  <td>
+                    <div className="d-flex align-items-center gap-2">
+                      <img src={p.image} alt={p.name} style={{width:"40px",height:"40px",objectFit:"cover", borderRadius:"4px"}}/>
+                      <span className="text-truncate" style={{maxWidth: "150px"}}>{p.name}</span>
+                    </div>
+                  </td>
+
+                  {/* category */}
+                  <td>{p.category}</td>
+
+                  {/* price */}
+                  <td>
+                    <div className="d-flex align-items-center gap-2">
+                       <input 
+                        type="number" 
+                        className="form-control form-control-sm"
+                        value={p.price} 
+                        style={{width:"80px"}}
+                        onChange={(e)=>{ setProducts((prev)=>
+                          prev.map((prod)=> prod._id === p._id ? { ...prod, price: Number(e.target.value)} : prod))}}
+                      />
+                      <button className="btn btn-sm" 
+                        style={{backgroundColor:"rgb(252, 107, 3)", color: "white", border:"none"}}
+                        disabled={Number(p.price) === Number(p.originalPrice)}
+                        onClick={()=>updatePrice(p._id, Number(p.price))}
+                      >Update</button>
+                    </div>
+                  </td>
+
+                  {/* stock toggle */}
+                  <td>
+                    <label className="switch">
+                        <input type="checkbox" checked={p.inStock} onChange={()=>toggleStock(p._id,p.inStock)}/>
+                        <span className="slider"></span>
+                    </label>
+                  </td>
+
+                  {/* delete button */}
+                  <td>
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={()=>deleteProduct(p._id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-
-        {/* Products */}
-        {
-            products.map((p)=>(
-                <div key={p._id} className="d-flex align-items-center p-2" style={{borderBottom:"1px solid #eee"}}>
-                    {/* product */}
-                    <div style={{flex:2}} className="d-flex align-items-center gap-2">
-                        <img src={p.image} alt={p.name} style={{width:"40px",height:"40px",objectFit:"cover", borderRadius:"4px"}}/>
-                        <span>{p.name}</span>
-                    </div>
-
-                    {/* category */}
-                    <div style={{flex:1}}>{p.category}</div>
-
-                    {/* price */}
-                    <div style={{flex:1, display:"flex", alignItems:"center"}}>
-                      <input type="number" value={p.price} style={{width:"60px"}}
-                          onChange={(e)=>{ setProducts((prev)=>
-                                    prev.map((prod)=> prod._id === p._id ? { ...prod, price: Number(e.target.value)} : prod))}}/>
-                      <button className="btn btn-sm btn-secondary" 
-                          style={{backgroundColor:"#fa6704ff",border:"none"}}
-                          disabled={Number(p.price) === Number(p.originalPrice)}
-                          onClick={()=>updatePrice(p._id, Number(p.price))}
-                          >update</button>
-                    </div>
-
-                    {/* stock toggle */}
-                    <div style={{flex:1}}>
-                        <label className="switch">
-                            <input type="checkbox" checked={p.inStock} onChange={()=>toggleStock(p._id,p.inStock)}/>
-                            <span className="slider"></span>
-                        </label>
-                    </div>
-
-                    {/* delete button */}
-<div style={{flex:1}}>
-  <button
-    className="btn btn-sm btn-danger"
-    onClick={()=>deleteProduct(p._id)}
-  >
-    Delete
-  </button>
-</div>
-                    
-                </div>
-            ))
-        }
 
         {/* Pagination */}
         <div className="mt-3 d-flex justify-content-center align-items-center gap-3">

@@ -1,11 +1,8 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../../config";
 
 function VendorsManagement() {
-
-
-      const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-    //const API_URL = "http://localhost:8000";
     const [vendors, setVendors] = useState([]);
     const token = localStorage.getItem("token");
 

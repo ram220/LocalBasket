@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useOutletContext } from "react-router-dom";
+import API_URL from "../../config";
 
 function SearchedPage() {
   const [searchedItems, setSearchedItems] = useState([]);
@@ -9,9 +10,6 @@ function SearchedPage() {
   const navigate = useNavigate();
 
   const {fetchCart} = useOutletContext();
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com"
-  //const API_URL = "http://localhost:8000";
   
   const token=localStorage.getItem("token"); 
 

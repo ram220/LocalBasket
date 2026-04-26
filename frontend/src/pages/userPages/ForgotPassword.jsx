@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
+import API_URL from "../../config";
 
 function ForgotPassword() {
   const [email,setEmail]=useState("");
   const [role,setRole]=useState("user");
   const [message,setMessage]=useState("");
   const [loading,setLoading]=useState(false);
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-  //const API_URL="http://localhost:8000";
 
   const handleSubmit=async(e)=>{
     if(!email || !role){
@@ -28,6 +26,7 @@ function ForgotPassword() {
       setMessage(res.data.message);
     }
     catch(err){
+      console.log(err);
       setMessage(err.response?.data.message || "Something went wrong");
     }
     finally{

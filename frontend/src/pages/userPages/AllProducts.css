@@ -1,13 +1,24 @@
-.products-btn{
-    background-color:whitesmoke;
-    border: 1px solid whitesmoke;
-    border-radius: 5px;
-    padding: 0.25rem 1rem;
+.category-pill {
+    background-color: #f0f0f0;
+    border: 1px solid #e0e0e0;
+    border-radius: 25px;
+    padding: 8px 20px;
     cursor: pointer;
+    white-space: nowrap;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    color: #555;
 }
-.products-btn:hover{
-    color: white;
+
+.category-pill.active {
     background-color: rgb(253, 110, 8);
+    color: white;
+    border-color: rgb(253, 110, 8);
+    box-shadow: 0 4px 10px rgba(253, 110, 8, 0.3);
+}
+
+.category-pill:hover:not(.active) {
+    background-color: #e0e0e0;
 }
 .shopnow-btn{
     justify-content: center;
@@ -63,10 +74,24 @@ box-shadow:0 2px 6px rgba(0,0,0,0.2);
 
 .products-filter {
   display: flex;
-  justify-content: center;
-  gap: 10px;
+  gap: 12px;
   overflow-x: auto;
-  padding: 10px;
+  padding: 15px 5px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+
+@media (min-width: 992px) {
+  .products-filter {
+    justify-content: center;
+    overflow-x: hidden;
+  }
+}
+
+.products-filter-wrapper {
+  position: relative;
+  width: 100%;
+  margin-bottom: 10px;
 }
 
 .product-image-container{

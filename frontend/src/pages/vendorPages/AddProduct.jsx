@@ -1,8 +1,8 @@
 import { useState } from "react";
 import axios from 'axios';
+import API_URL from "../../config";
 
 function AddProduct() {
-
   const [formData,setFormData]=useState({
     name:"",
     price:"",
@@ -14,11 +14,7 @@ function AddProduct() {
 
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
-
   const [loading, setLoading] = useState(false);
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-  //const API_URL="http://localhost:8000";
 
   const handleChange=(e)=>{
     setFormData({...formData, [e.target.name]: e.target.value})
@@ -61,7 +57,7 @@ function AddProduct() {
     }
   }
   return (
-    <div style={{ maxWidth: "300px", margin: "20px" }}>
+    <div style={{ maxWidth: "800px", margin: "20px auto", padding: "20px", background: "#fff", borderRadius: "12px", boxShadow: "0 2px 10px rgba(0,0,0,0.05)" }}>
       <div className="p-2">
         <h5>Product Images</h5>
         <form onSubmit={handleSubmit}>
@@ -113,15 +109,15 @@ function AddProduct() {
               placeholder="Type here"
               name="name"
               onChange={handleChange}
-              style={{ border: "1px solid", borderRadius: "3px", width: "230px" }}
+              style={{ border: "1px solid #ddd", borderRadius: "8px", width: "100%", padding: "10px" }}
             />
           </div>
 
-          <div className="mt-2">
+          <div className="mt-2 text-dark">
             <h5>Product Category</h5>
             <select
               name="category" onChange={handleChange}
-              style={{ width: "230px" }}
+              style={{ width: "100%", padding: "10px", borderRadius: "8px", border: "1px solid #ddd" }}
             >
               <option>Select Category</option>
               <option>Grocery</option>
@@ -140,7 +136,7 @@ function AddProduct() {
               min={0}
               name="price"
               onChange={handleChange}
-              style={{ border: "1px solid", borderRadius: "3px", width: "230px" }}
+              style={{ border: "1px solid #ddd", borderRadius: "8px", width: "100%", padding: "10px" }}
             />
           </div>
 
@@ -151,7 +147,7 @@ function AddProduct() {
               placeholder="Enter comma separated keywords"
               name="keywords"
               onChange={handleChange}
-              style={{ border: "1px solid", borderRadius: "3px", width: "230px" }}
+              style={{ border: "1px solid #ddd", borderRadius: "8px", width: "100%", padding: "10px" }}
             />
           </div>
 
@@ -161,7 +157,7 @@ function AddProduct() {
               type="date"
               name="expiryDate"
               onChange={handleChange}
-              style={{ border: "1px solid", borderRadius: "3px", width: "230px" }}
+              style={{ border: "1px solid #ddd", borderRadius: "8px", width: "100%", padding: "10px" }}
             />
           </div>
 
@@ -173,7 +169,7 @@ function AddProduct() {
               placeholder="Enter anything about the product"
               name="description"
               onChange={handleChange}
-              style={{ border: "1px solid", borderRadius: "3px", width: "500px", height:"150px"}}
+              style={{ border: "1px solid #ddd", borderRadius: "8px", width: "100%", height:"150px", padding: "10px"}}
             />
           </div>
 

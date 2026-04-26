@@ -74,12 +74,43 @@
 
 /* RESPONSIVE FOR MOBILE */
 @media (max-width: 768px) {
-  .cart-container {
-    overflow-x: auto; /* allow horizontal scroll */
+  .cart-header {
+    display: none; /* Hide headers on mobile */
   }
 
-  .cart-row, .cart-header {
-    min-width: 500px; /* ensures table structure is preserved */
-    flex-wrap: nowrap;
+  .cart-row {
+    flex-direction: column;
+    align-items: flex-start;
+    position: relative;
+    padding: 15px 0;
+  }
+
+  .cart-product-info {
+    flex: 1 1 100%;
+    width: 100%;
+    margin-bottom: 10px;
+  }
+
+  .cart-product-info img {
+    width: 70px;
+    height: 70px;
+  }
+
+  .cart-subtotal {
+    width: 100%;
+    text-align: left;
+    font-weight: bold;
+    color: var(--primary-color);
+    margin-left: 80px; /* Align with text next to image */
+  }
+
+  .cart-action {
+    position: absolute;
+    top: 15px;
+    right: 0;
+  }
+
+  .cart-product-info div {
+    flex-grow: 1;
   }
 }

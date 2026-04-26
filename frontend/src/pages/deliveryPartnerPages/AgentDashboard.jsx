@@ -1,12 +1,10 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import API_URL from "../../config";
 
 function AgentDashboard() {
 
   const [isAvailable, setIsAvailable] = useState(false);
-
-  const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-  //const API_URL = "http://localhost:8000";
   const token = localStorage.getItem("token");
 
   useEffect(() => {

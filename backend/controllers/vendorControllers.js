@@ -338,7 +338,7 @@ exports.updateItemStatus=async(req,res)=>{
             }
 
 
-        // 🚀 Assign agent when ANY item becomes ready
+        //  Assign agent when any item becomes ready
 
         const anyReady = order.items.some(i => i.status === "Ready");
 

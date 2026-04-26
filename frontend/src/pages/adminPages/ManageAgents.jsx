@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import API_URL from "../../config";
 
 function ManageAgents() {
 
-    const API_URL="https://localbasket-multi-vendor-marketplace.onrender.com";
-  //const API_URL = "http://localhost:8000";
   const token = localStorage.getItem("token");
 
   const [agents, setAgents] = useState([]);
