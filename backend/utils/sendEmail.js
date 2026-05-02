@@ -1,25 +1,19 @@
-const nodemailer = require("nodemailer");
-const dns = require("dns");
+const sgMail = require("@sendgrid/mail");
 
-// Force Node to prefer IPv4 over IPv6. This fixes the 'ENETUNREACH' error on Render
-// because Render's outbound IPv6 routing often fails for external SMTP servers.
-dns.setDefaultResultOrder('ipv4first');
-
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: process.env.EMAIL_PORT || 587, // 587 is often better supported in cloud environments
-    secure: process.env.EMAIL_PORT == 465, // true for 465, false for 587
-    auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS
-    }
-});
+if (process.env.SENDGRID_API_KEY) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
 const sendEmail = async (to, subject, text) => {
     try {
-        const info = await transporter.sendMail({
-            from: `"LocalBasket Team" <${process.env.EMAIL_USER}>`,
+        if (!process.env.SENDGRID_API_KEY) {
+            console.warn("⚠️ SENDGRID_API_KEY is missing from environment variables.");
+            return { success: false, error: "SENDGRID_API_KEY is missing" };
+        }
+
+        const msg = {
             to,
+            from: process.env.EMAIL_USER, // This MUST be the email you verified in SendGrid
             subject,
             text, // Plain text fallback
             html: `
@@ -30,13 +24,16 @@ const sendEmail = async (to, subject, text) => {
                     <p style="font-size: 12px; color: #777;">This is an automated message from LocalBasket. Please do not reply.</p>
                 </div>
             `
-        });
-        
-        console.log("✅ Email sent successfully. Message ID:", info.messageId);
-        return { success: true, messageId: info.messageId };
+        };
+
+        const response = await sgMail.send(msg);
+
+        console.log("✅ SendGrid Email sent successfully:", response[0].statusCode);
+        return { success: true, messageId: response[0].headers['x-message-id'] || "SendGrid" };
+
     } catch (err) {
-        console.error("❌ Email sending failed. Error details:", err.message);
-        return { success: false, error: err.message };
+        console.error("❌ SendGrid Error details:", JSON.stringify(err.response?.body) || err.message);
+        return { success: false, error: err.response?.body || err.message };
     }
 };
 
