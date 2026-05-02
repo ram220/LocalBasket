@@ -29,8 +29,9 @@ const sendEmail = async (to, subject, text) => {
         
         console.log("✅ Email sent successfully. Message ID:", info.messageId);
     } catch (err) {
-        console.log("❌ Email sending failed. Error details:", err.message);
-        throw err; // throw error so the calling function knows it failed
+        console.error("❌ Email sending failed. Error details:", err.message);
+        // We remove 'throw err;' here. Throwing an error in a non-awaited async function causes 
+        // the Node.js process to crash completely with an Unhandled Promise Rejection.
     }
 };
 
