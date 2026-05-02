@@ -37,6 +37,17 @@ app.get("/",(req,res)=>{
     res.send("hello from the server")
 });
 
+const sendEmail = require('./utils/sendEmail');
+app.get("/api/test-email", async (req, res) => {
+    const to = req.query.email || process.env.EMAIL_USER;
+    const result = await sendEmail(to, "Test Email from LocalBasket", "If you receive this, your Render email config is perfect!");
+    
+    if (result.success) {
+        res.json({ message: "Email sent successfully!", ...result, check: "Check your inbox!" });
+    } else {
+        res.status(500).json({ message: "Email failed to send. Check this exact error:", error: result.error, hint: "Are EMAIL_USER and EMAIL_PASS set correctly in Render?" });
+    }
+});
 
 const port=process.env.PORT || 7000;
 app.listen(port,()=>{
