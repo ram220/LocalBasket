@@ -75,6 +75,41 @@ exports.protectRoutes=async(req,res,next)=>{
     }
 }
 
+exports.optionalAuth = async (req, res, next) => {
+    try {
+        const testToken = req.headers.authorization;
+        if (!testToken || !testToken.startsWith("Bearer ")) {
+            req.user = null;
+            return next();
+        }
+
+        const token = testToken.split(" ")[1];
+        if (token === "null" || !token) {
+            req.user = null;
+            return next();
+        }
+
+        let decodedToken;
+        try {
+            decodedToken = jwt.verify(token, process.env.MY_LOCALBASKET_SECRET_KEY);
+        } catch (err) {
+            req.user = null;
+            return next();
+        }
+
+        let user = await Users.findById(decodedToken.id);
+        if (!user) user = await Vendors.findById(decodedToken.id);
+        if (!user) user = await Admin.findById(decodedToken.id);
+        if (!user) user = await DeliveryAgent.findById(decodedToken.id);
+
+        req.user = user || null;
+        next();
+    } catch (err) {
+        req.user = null;
+        next();
+    }
+};
+
 exports.isAdmin=(req,res,next)=>{
     if(req.user.role!=="admin"){
         return res.status(403).json({

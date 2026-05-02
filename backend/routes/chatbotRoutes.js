@@ -4,6 +4,6 @@ const chatbotController=require('../controllers/chatbotController');
 
 const router=express.Router();
 
-router.post('/',authMiddleware.protectRoutes,authMiddleware.isUser,chatbotController.chatBot);
+router.post('/',authMiddleware.optionalAuth,chatbotController.chatBot);
 
 module.exports=router;
