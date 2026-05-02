@@ -20,20 +20,32 @@ function Chatbot({setCart}) {
   const handleMouseDown = (e) => {
     setIsDragging(true);
     isMoved.current = false;
+    
+    // Support for both mouse and touch events
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
     dragStartPos.current = {
-      x: e.clientX,
-      y: e.clientY,
+      x: clientX,
+      y: clientY,
       right: position.right,
       bottom: position.bottom
     };
-    e.preventDefault(); // Prevent text selection
+    
+    // Only prevent default on mouse events to avoid blocking touch scrolling if needed
+    if (!e.touches) {
+      e.preventDefault();
+    }
   };
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
     
-    const dx = dragStartPos.current.x - e.clientX;
-    const dy = dragStartPos.current.y - e.clientY;
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+    const dx = dragStartPos.current.x - clientX;
+    const dy = dragStartPos.current.y - clientY;
 
     if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
       isMoved.current = true;
@@ -51,15 +63,21 @@ function Chatbot({setCart}) {
 
   useEffect(() => {
     if (isDragging) {
-      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mousemove', handleMouseMove, { passive: false });
       window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('touchmove', handleMouseMove, { passive: false });
+      window.addEventListener('touchend', handleMouseUp);
     } else {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleMouseMove);
+      window.removeEventListener('touchend', handleMouseUp);
     }
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleMouseMove);
+      window.removeEventListener('touchend', handleMouseUp);
     };
   }, [isDragging]);
 
@@ -137,6 +155,7 @@ function Chatbot({setCart}) {
       <div 
         className="chatbot-icon" 
         onMouseDown={handleMouseDown}
+        onTouchStart={handleMouseDown}
         onClick={() => {
           if (!isMoved.current) {
             setOpen(!open);
