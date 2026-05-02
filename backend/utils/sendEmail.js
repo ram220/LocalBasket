@@ -1,38 +1,9 @@
-const sgMail = require("@sendgrid/mail");
-
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-
-const sendEmail = async (to, subject, text) => {
-    try {
-        const msg = {
-            to,
-            from: process.env.EMAIL_USER, // must be verified
-            subject,
-            text,
-        };
-
-        const response = await sgMail.send(msg);
-
-        console.log("✅ Email sent:", response[0].statusCode);
-
-    } catch (err) {
-        console.log("❌ SendGrid Error:", err.response?.body || err.message);
-        throw err;
-    }
-};
-
-module.exports = sendEmail;
-
-
-
-
-
-/*const nodemailer = require("nodemailer");
+const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port:process.env.EMAIL_PORT,
-    secure:true,
+    port: process.env.EMAIL_PORT || 465,
+    secure: true, // true for 465, false for other ports
     auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS
@@ -41,15 +12,18 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = async (to, subject, text) => {
     try {
-        await transporter.sendMail({
+        const info = await transporter.sendMail({
             from: `"LocalBasket" <${process.env.EMAIL_USER}>`,
             to,
             subject,
             text
         });
+        
+        console.log("✅ Email sent successfully. Message ID:", info.messageId);
     } catch (err) {
-        console.log("Email error:", err);
+        console.log("❌ Email sending failed. Error details:", err.message);
+        throw err; // throw error so the calling function knows it failed
     }
 };
 
-module.exports = sendEmail;*/
+module.exports = sendEmail;
