@@ -59,6 +59,10 @@ function MyOrders() {
       <h4>
         <span style={{ color: "rgb(252, 107, 3)" }}>My</span> Orders
       </h4>
+
+      <div className="alert alert-warning mt-3 shadow-sm border-warning" role="alert" style={{ borderRadius: "8px" }}>
+        <strong>⚠️ Caution:</strong> As we are currently using a free-tier database (MongoDB), your order history will be automatically deleted every month. Please take note of this!
+      </div>
       {
         orders.length === 0 ? ( <p className="mt-3">You have no orders yet.</p>
           ) : (
