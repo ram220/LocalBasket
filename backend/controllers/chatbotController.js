@@ -384,22 +384,24 @@ exports.chatBot = async (req, res) => {
     if (intent === "RECOMMEND_CATEGORY") {
       let keywords = [];
 
-      if (/breakfast|milk|bread|egg|butter/.test(text)) keywords = ["milk", "bread", "egg", "butter", "breakfast"];
-      else if (/juice|shake|fresh/.test(text)) keywords = ["juice", "shake", "fresh"];
-      else if (/biryani|meal|thali|curry|rice/.test(text)) keywords = ["biryani", "meal", "thali", "curry", "rice", "fried rice"];
-      else if (/starter|tikka|kebab|manchurian|soup/.test(text)) keywords = ["starter", "tikka", "kebab", "manchurian", "soup"];
-      else if (/sweet|ice cream|cake|dessert|desert|pastry|chocolate/.test(text)) keywords = ["ice cream", "cake", "dessert", "pastry", "chocolate", "sweets"];
-      else if (/pizza|burger|fries|fast food|roll|sandwich/.test(text)) keywords = ["pizza", "burger", "fries", "fast food", "roll", "sandwich"];
-      else if (/grocer|staple|dal|oil|sugar|salt/.test(text)) keywords = ["grocery", "dal", "oil", "sugar", "salt", "atta", "rice"];
-      else if (/fruit|apple|banana|mango|grapes|orange/.test(text)) keywords = ["fruit", "apple", "banana", "mango", "grapes", "orange", "fruits"];
-      else if (/veg|onion|potato|tomato|cabbage|carrot/.test(text)) keywords = ["vegetable", "onion", "potato", "tomato", "veg", "vegetables"];
-      else if (/dairy|paneer|cheese|curd/.test(text)) keywords = ["dairy", "paneer", "cheese", "curd", "milk", "butter"];
-      else keywords = ["mixture", "chat", "chips", "namkeen", "snack", "samosa", "kurkure", "lays"];
+      if (/breakfast|milk|bread|egg|butter/.test(text)) keywords = ["milk", "bread", "egg", "butter", "breakfast", "dairy"];
+      else if (/juice|shake|fresh|drink|beverage/.test(text)) keywords = ["juice", "fresh", "drink", "beverage"];
+      else if (/biryani|meal|thali|curry|rice/.test(text)) keywords = ["biryani", "meal", "roti"];
+      else if (/starter|tikka|kebab|manchurian|soup/.test(text)) keywords = ["starter", "snack"];
+      else if (/sweet|ice cream|cake|dessert|desert|pastry|chocolate/.test(text)) keywords = ["ice cream", "dessert", "sweet", "chocolate"];
+      else if (/pizza|burger|fries|fast food|junk food|roll|sandwich/.test(text)) keywords = ["fast food", "junk food"];
+      else if (/grocer|staple|dal|oil|sugar|salt|rice/.test(text)) keywords = ["grocery", "dal", "oil", "staple", "rice", "biscuit"];
+      else if (/fruit|apple|banana|mango|grapes|orange/.test(text)) keywords = ["fruit", "fresh"];
+      else if (/veg|onion|potato|tomato|cabbage|carrot/.test(text)) keywords = ["vegetable", "veg", "fresh"];
+      else if (/dairy|paneer|cheese|curd/.test(text)) keywords = ["dairy", "milk", "breakfast"];
+      else keywords = ["chips", "snack", "namkeen", "biscuit"];
+
+      const regexKeywords = keywords.map(kw => new RegExp(`^${kw}s?$`, 'i'));
 
       const products = await Products.find({
         $or: [
-          { name: { $regex: keywords.join("|"), $options: "i" } },
-          { keywords: { $in: keywords } }
+          { keywords: { $in: regexKeywords } },
+          { category: { $in: regexKeywords } }
         ],
         inStock: true
       }).populate("vendorId", "shopName").limit(6);
