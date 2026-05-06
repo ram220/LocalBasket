@@ -11,8 +11,6 @@ function OrderSummary({ cart,setCart }) {
 
   const [paymentMethod,setPaymentMethod] = useState("COD");
 
-  const DELIVERY_CHARGE = 15;
-
   const token=localStorage.getItem("token");
 
   useEffect(()=>{
@@ -40,7 +38,32 @@ function OrderSummary({ cart,setCart }) {
     return total + item.finalPrice * item.quantity;
   },0);
 
-  const total = itemsTotal + DELIVERY_CHARGE;
+  const vendorSubtotals = {};
+  cart.forEach(item => {
+      const vId = item.vendorId?._id || item.productId?.vendorId?._id || item.productId?.vendorId || "unknown";
+      const vName = item.productId?.vendorId?.shopName || "this shop";
+      if (!vendorSubtotals[vId]) vendorSubtotals[vId] = { amount: 0, name: vName };
+      vendorSubtotals[vId].amount += item.finalPrice * item.quantity;
+  });
+
+  let vendorProtectionFee = 0;
+  let vendorWarnings = [];
+  Object.values(vendorSubtotals).forEach(sub => {
+      if (sub.amount > 0 && sub.amount < 100) {
+          vendorProtectionFee += 15;
+          vendorWarnings.push(`Add ₹${100 - sub.amount} more from ${sub.name} to remove the Small Shop fee`);
+      }
+  });
+
+  const PLATFORM_FEE = 10;
+  let DELIVERY_CHARGE = 15; // default
+  if(itemsTotal >= 200) {
+      DELIVERY_CHARGE = 0;
+  } else if(itemsTotal >= 100) {
+      DELIVERY_CHARGE = 15;
+  }
+
+  const total = itemsTotal + DELIVERY_CHARGE + PLATFORM_FEE + vendorProtectionFee;
 
   const handlePlaceOrder = async()=>{
     if(loading) return;
@@ -49,8 +72,8 @@ function OrderSummary({ cart,setCart }) {
         return;
     }
 
-    if(itemsTotal<200){
-      alert("Minimum order amount is ₹200");
+    if(itemsTotal<100){
+      alert("Minimum order amount is ₹100");
       return;
     }
 
@@ -67,6 +90,8 @@ function OrderSummary({ cart,setCart }) {
         })),
         itemsTotal,
         deliveryCharge: DELIVERY_CHARGE,
+        platformFee: PLATFORM_FEE,
+        vendorProtectionFee: vendorProtectionFee,
         totalAmount: total,
         paymentMethod
     };
@@ -169,9 +194,33 @@ function OrderSummary({ cart,setCart }) {
           </div>
 
           <div className="d-flex justify-content-between mb-2">
-            <span className="text-muted">Delivery Charge</span>
-            <span className="fw-semibold">₹{DELIVERY_CHARGE}</span>
+            <span className="text-muted">Platform Fee</span>
+            <span className="fw-semibold">₹{PLATFORM_FEE}</span>
           </div>
+
+          <div className="d-flex justify-content-between mb-2">
+            <span className="text-muted">Delivery Charge</span>
+            <span className="fw-semibold">
+              {DELIVERY_CHARGE === 0 ? <span className="text-success">Free</span> : `₹${DELIVERY_CHARGE}`}
+            </span>
+          </div>
+          {itemsTotal >= 100 && itemsTotal < 200 && (
+            <p className="small mb-3 p-1 rounded" style={{ backgroundColor: "#e2f3e5", color: "#28a745", fontSize: "0.8rem", textAlign: "right" }}>
+              🎉 Add ₹{200 - itemsTotal} more for Free Delivery!
+            </p>
+          )}
+
+          {vendorProtectionFee > 0 && (
+          <div className="d-flex justify-content-between mb-2">
+            <span className="text-muted">Small Shop Order Fee</span>
+            <span className="fw-semibold text-danger">₹{vendorProtectionFee}</span>
+          </div>
+          )}
+          {vendorWarnings.map((warn, i) => (
+            <p key={i} className="small mb-3 p-1 rounded" style={{ backgroundColor: "#fff3cd", color: "#856404", fontSize: "0.8rem", textAlign: "right" }}>
+              ⚠️ {warn}
+            </p>
+          ))}
 
           <hr className="my-3" />
 
@@ -181,8 +230,8 @@ function OrderSummary({ cart,setCart }) {
               <span className="fw-bold h5 mb-0" style={{ color: "rgb(252, 107, 3)" }}>₹{total}</span>
             </div>
           </div>
-          {itemsTotal < 200 && (
-            <p className="text-danger small mt-2 mb-0">Minimum order amount should be ₹200</p>
+          {itemsTotal < 100 && (
+            <p className="text-danger small mt-2 mb-0">Minimum order amount should be ₹100</p>
           )}
         </div>
 
@@ -190,7 +239,7 @@ function OrderSummary({ cart,setCart }) {
         <button
           className="btn btn-lg w-100 mt-4 text-white fw-bold shadow-sm"
           onClick={handlePlaceOrder}
-          disabled={loading || itemsTotal < 200}
+          disabled={loading || itemsTotal < 100}
           style={{
             background: loading ? "#ccc" : "rgb(252, 107, 3)",
             borderRadius: "12px",

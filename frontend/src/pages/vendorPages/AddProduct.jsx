@@ -122,10 +122,9 @@ function AddProduct() {
               <option>Select Category</option>
               <option>Grocery</option>
               <option>Junk Foods</option>
-              <option>Medical</option>
-              <option>Bakery</option>
-              <option>Sweets</option>
               <option>Fruits & Juices</option>
+              <option>Cool Drinks & Ice Creams</option>
+              <option>Snacks</option>
             </select>
           </div>
 

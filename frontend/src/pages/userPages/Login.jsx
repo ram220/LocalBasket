@@ -52,7 +52,7 @@ function Login({setIsLoggedIn,fetchCart}) {
       if(role === "user") navigate("/");
       else if(role === "vendor") navigate("/vendor");
       else if(role==="delivery_agent") navigate("/agent/dashboard")
-      else navigate("/admin");
+      else navigate("/admin/vendors");
     }
     catch(err){
       setErrors({general:err.response?.data.message || "login failed"});

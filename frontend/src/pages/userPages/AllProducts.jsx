@@ -77,7 +77,7 @@ function AllProducts() {
         {/* 🔥 CATEGORY FILTER */}
         <div className="products-filter-wrapper">
           <div className="products-filter">
-            {["all", "Grocery", "Junk Foods", "Medical", "Bakery","Sweets","Fruits & Juices"].map((cat) => (
+            {["all", "Grocery", "Junk Foods", "Fruits & Juices", "Cool Drinks & Ice Creams", "Snacks"].map((cat) => (
               <button
                 key={cat}
                 className={`category-pill ${category === cat ? 'active' : ''}`}

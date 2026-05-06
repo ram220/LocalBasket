@@ -35,7 +35,7 @@ function AdminTopNavbar({ logoutUser }) {
                     >
                         ☰
                     </button>
-                    <Link className="navbar-brand d-flex align-items-center m-0" to="/admin/vendors">
+                    <Link className="navbar-brand d-flex align-items-center m-0" to="/admin/dashboard">
                         <img
                         src="/localbasket-logo.png"
                         alt="logo"
@@ -76,6 +76,7 @@ function AdminTopNavbar({ logoutUser }) {
                             <Link to="/admin/vendors" className="drawer-link" onClick={() => setIsMenuOpen(false)}>Manage Vendors</Link>
                             <Link to="/admin/orders" className="drawer-link" onClick={() => setIsMenuOpen(false)}>Orders</Link>
                             <Link to="/admin/agents" className="drawer-link" onClick={() => setIsMenuOpen(false)}>Manage Agents</Link>
+                            <Link to="/admin/dashboard" className="drawer-link" onClick={() => setIsMenuOpen(false)}>Platform Income</Link>
                             <div className="border-top pt-3 mt-2">
                                 <button className="btn btn-outline-danger w-100" onClick={handleLogout}>Logout</button>
                             </div>

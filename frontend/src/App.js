@@ -1,5 +1,5 @@
 import {React, useEffect, useState} from 'react';
-import {BrowserRouter,Routes,Route} from 'react-router-dom'
+import {BrowserRouter,Routes,Route, Navigate} from 'react-router-dom'
 import Home from './pages/userPages/Home';
 import Login from './pages/userPages/Login';
 import UserRegister from './pages/userPages/UserRegister';
@@ -34,6 +34,7 @@ import ForgotPassword from './pages/userPages/ForgotPassword';
 import './App.css'
 import ResetPassword from './pages/userPages/ResetPassword';
 import AgentDashboard from './pages/deliveryPartnerPages/AgentDashboard';
+import AdminDashboard from './pages/adminPages/AdminDashboard';
 import API_URL from './config';
 
 function App() {
@@ -148,7 +149,8 @@ const logoutUser = () => {
         element={isLoggedIn && localStorage.getItem("role")==="admin"
         ? <AdminLayout logoutUser={logoutUser}/>
         : <Login setIsLoggedIn={setIsLoggedIn}/> }>
-
+          <Route index element={<Navigate to="/admin/vendors" replace />} />
+          <Route path="dashboard" element={<AdminDashboard/>}/>
           <Route path="vendors" element={<VendorsManagement/>}/>
           <Route path="orders" element={<AdminOrders/>}/>
           {/*<Route path='add_agent' element={<AddDeliveryAgent/>}/>*/}

@@ -4,6 +4,7 @@ import API_URL from "../../config";
 
 function AgentOrders(){
     const [orders,setOrders] = useState([]);
+    const [otpInputs, setOtpInputs] = useState({});
     const token=localStorage.getItem("token");
 
     useEffect(()=>{
@@ -26,7 +27,7 @@ function AgentOrders(){
         const grouped = {};
 
         items.forEach(item => {
-            const vendorName = item.vendorId?.shopName;
+            const vendorName = item.productId?.vendorId?.shopName || item.vendorId?.shopName || "Unknown Vendor";
 
             if (!grouped[vendorName]) {
                 grouped[vendorName] = [];
@@ -38,32 +39,59 @@ function AgentOrders(){
         return grouped;
     };
 
-    const updateStatus = async(orderId,status)=>{
-        await axios.patch(`${API_URL}/api/agent/updateDeliveryStatus`,
-        {orderId,status},
-        {headers:{Authorization:`Bearer ${token}`}});
+    const handleOtpChange = (orderId, value) => {
+        setOtpInputs(prev => ({ ...prev, [orderId]: value }));
+    };
 
-        setOrders(prev =>
-            prev.map(order =>
-                order._id === orderId
-                ? {...order,deliveryStatus:status}
-                : order
-            )
-        );
+    const updateStatus = async(orderId,status)=>{
+        const otp = otpInputs[orderId];
+        
+        if(status === "Delivered" && (!otp || otp.length !== 4)){
+            alert("Please enter the 4-digit OTP provided by the customer");
+            return;
+        }
+
+        try {
+            await axios.patch(`${API_URL}/api/agent/updateDeliveryStatus`,
+            {orderId,status,otp},
+            {headers:{Authorization:`Bearer ${token}`}});
+
+            setOrders(prev =>
+                prev.map(order =>
+                    order._id === orderId
+                    ? {...order,deliveryStatus:status}
+                    : order
+                )
+            );
+            
+            if(status === "Delivered") {
+                setOtpInputs(prev => {
+                    const newState = {...prev};
+                    delete newState[orderId];
+                    return newState;
+                });
+            }
+        } catch (err) {
+            alert(err.response?.data?.message || "Error updating status");
+        }
     };
 
     const updatePayment = async(orderId)=>{
-        await axios.patch(`${API_URL}/api/agent/updatePaymentStatus`,
-        {orderId},
-        {headers:{Authorization:`Bearer ${token}`}});
+        try {
+            await axios.patch(`${API_URL}/api/agent/updatePaymentStatus`,
+            {orderId},
+            {headers:{Authorization:`Bearer ${token}`}});
 
-        setOrders(prev =>
-            prev.map(order =>
-                order._id === orderId
-                ? {...order,paymentStatus:"Completed"}
-                : order
-            )
-        );
+            setOrders(prev =>
+                prev.map(order =>
+                    order._id === orderId
+                    ? {...order,paymentStatus:"Completed"}
+                    : order
+                )
+            );
+        } catch (err) {
+            alert(err.response?.data?.message || "Error updating payment status");
+        }
     };
 
     const badgeColor = (status)=>{
@@ -84,8 +112,17 @@ function AgentOrders(){
 
             {orders.length > 0 ? (
 
-                orders.map(order => (
+                orders.map(order => {
 
+                    let vendorTotal={};
+
+                    order.items.forEach(item=>{
+                        const vendor = item.productId?.vendorId?.shopName || item.vendorId?.shopName || "Unknown Vendor";
+                        if(!vendorTotal[vendor]) vendorTotal[vendor]=0;
+                        vendorTotal[vendor]+=item.price*item.quantity;
+                    });
+
+                    return (
                     <div key={order._id} className="card shadow-lg mb-4 p-3">
 
                         {/* HEADER */}
@@ -123,6 +160,9 @@ function AgentOrders(){
                                     {order.paymentStatus}
                                 </span>
                             </p>
+                            <p>
+                                Total Amount: <strong>₹{order.totalAmount}</strong>
+                            </p>
                         </div>
 
                         <hr/>
@@ -136,7 +176,10 @@ function AgentOrders(){
                                 <div key={vendor} className="mb-3 border rounded p-2">
 
                                     {/* VENDOR HEADER */}
-                                    <h6 className="text-primary">🏪 {vendor}</h6>
+                                    <h6 className="text-primary d-flex justify-content-between">
+                                        <span>🏪 {vendor}</span>
+                                        <span>₹{vendorTotal[vendor] || 0}</span>
+                                    </h6>
 
                                     {items.map(item => (
 
@@ -166,6 +209,22 @@ function AgentOrders(){
                         }
 
                         <hr/>
+
+                        {/* OTP INPUT */}
+                        {order.deliveryStatus === "Out for Delivery" && (
+                            <div className="mb-3">
+                                <label className="form-label small fw-bold">Enter Delivery OTP</label>
+                                <input
+                                    type="text"
+                                    className="form-control form-control-sm"
+                                    placeholder="4-digit OTP"
+                                    maxLength="4"
+                                    value={otpInputs[order._id] || ""}
+                                    onChange={(e) => handleOtpChange(order._id, e.target.value)}
+                                    style={{maxWidth: "150px"}}
+                                />
+                            </div>
+                        )}
 
                         {/* ACTION BUTTONS */}
                         <div className="d-flex flex-wrap gap-2">
@@ -213,7 +272,8 @@ function AgentOrders(){
 
                     </div>
 
-                ))
+                    );
+                })
 
             ) : (
                 <p className="text-center">No Assigned Orders</p>

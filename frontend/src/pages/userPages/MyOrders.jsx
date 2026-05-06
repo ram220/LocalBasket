@@ -63,6 +63,12 @@ function MyOrders() {
       <div className="alert alert-warning mt-3 shadow-sm border-warning" role="alert" style={{ borderRadius: "8px" }}>
         <strong>⚠️ Caution:</strong> As we are currently using a free-tier database (MongoDB), your order history will be automatically deleted every month. Please take note of this!
       </div>
+
+      {orders.some(order => order.deliveryStatus === "Pending") && (
+        <div className="alert alert-info mt-3 shadow-sm border-info" role="alert" style={{ borderRadius: "8px", backgroundColor: "#e3f2fd", color: "#0d47a1" }}>
+          <strong>ℹ️ Notice:</strong> Our delivery agents are currently busy handling other orders. Your order is in queue and will be assigned shortly. Thank you for your patience!
+        </div>
+      )}
       {
         orders.length === 0 ? ( <p className="mt-3">You have no orders yet.</p>
           ) : (
@@ -81,14 +87,21 @@ Delivery Status:
 {order.deliveryStatus}
 </strong>
 </p>
-                <p>
+                 <p>
 Delivery Agent:
 <strong>
 {order.deliveryAgentId
   ? `${order.deliveryAgentId.name} (${order.deliveryAgentId.mobile})`
-  : "Not Assigned Yet"}
+  : order.deliveryStatus === "Pending" ? "Waiting for Agent (Busy)" : "Not Assigned Yet"}
 </strong>
 </p>
+{order.orderStatus !== "Delivered" && order.orderStatus !== "Cancelled" && (
+  <p className="p-2 rounded" style={{backgroundColor: "#fff3cd", border: "1px solid #ffeeba", display: "inline-block"}}>
+    🔑 Delivery OTP: <strong>{order.deliveryOTP}</strong>
+    <br/>
+    <small className="text-muted">Share this only with the agent at delivery.</small>
+  </p>
+)}
                 <p>Payment Method: <strong style={{marginLeft: "5px"}}>
                   {order.paymentMethod === "UPI" ? "UPI (Online)" : "Cash On Delivery"}</strong>
                 </p>
