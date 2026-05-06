@@ -5,9 +5,22 @@ const crypto=require("crypto");
 
 exports.createSubscriptionOrder = async (req,res)=>{
     try{
+        const vendor = await Vendors.findById(req.user.id);
+        
+        let amountInRupees = 4000; // default
+        if(vendor && vendor.category) {
+            const cat = vendor.category.toLowerCase();
+            if(cat.includes("restaurant") || cat.includes("food")) {
+                amountInRupees = 5000;
+            } else if(cat.includes("grocery") || cat.includes("supermarket") || cat.includes("kirana") || cat.includes("snacks")) {
+                amountInRupees = 4000;
+            } else if(cat.includes("fruit") || cat.includes("juice") || cat.includes("drinks") || cat.includes("ice cream")) {
+                amountInRupees = 3000;
+            }
+        }
 
         const options = {
-            amount: 30000, // ₹999
+            amount: amountInRupees * 100, // Razorpay expects paise
             currency: "INR",
             receipt: "vendor_sub_" + Date.now()
         }
@@ -107,11 +120,24 @@ exports.getSubscriptionStatus = async (req,res)=>{
             }
         }
 
+        let amountInRupees = 4000; // default
+        if(vendor && vendor.category) {
+            const cat = vendor.category.toLowerCase();
+            if(cat.includes("restaurant") || cat.includes("food")) {
+                amountInRupees = 5000;
+            } else if(cat.includes("grocery") || cat.includes("supermarket") || cat.includes("kirana") || cat.includes("snacks")) {
+                amountInRupees = 4000;
+            } else if(cat.includes("fruit") || cat.includes("juice") || cat.includes("drinks") || cat.includes("ice cream")) {
+                amountInRupees = 3000;
+            }
+        }
+
         res.json({
             subscriptionStatus:vendor.subscriptionStatus,
             trialEndDate:vendor.trialEndDate,
             subscriptionEndDate:vendor.subscriptionEndDate,
-            daysLeft
+            daysLeft,
+            subscriptionAmount: amountInRupees
         })
 
     }

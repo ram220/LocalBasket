@@ -58,41 +58,47 @@ exports.placeOrder = async(req,res)=>{
 
 // to here
 
-/*const updatedItems = cart.items.map(item => {
-    const offerData = calculateOffer(item.productId);
-    const finalPrice = offerData.finalPrice || item.productId.price;
+    const vendorSubtotals = {};
+    for (const item of updatedItems) {
+        const vId = item.vendorId.toString();
+        if (!vendorSubtotals[vId]) vendorSubtotals[vId] = 0;
+        vendorSubtotals[vId] += item.price * item.quantity;
+    }
 
-    itemsTotal += finalPrice * item.quantity;
+    let vendorProtectionFee = 0;
+    Object.values(vendorSubtotals).forEach(sub => {
+        if (sub > 0 && sub < 100) {
+            vendorProtectionFee += 15;
+        }
+    });
 
-    return {
-        productId: item.productId._id,
-        name:item.productId.name,
-        quantity: item.quantity,
-        price: finalPrice,
-        image: item.productId.image,
-        vendorId: item.productId.vendorId
-    };
-});*/
+    const platformFee = 10;
+    let deliveryCharge = 15;
+    if (itemsTotal >= 200) {
+        deliveryCharge = 0;
+    } else if (itemsTotal >= 100) {
+        deliveryCharge = 15;
+    }
 
-    const deliveryCharge = 15; // or your logic
-    const totalAmount = itemsTotal + deliveryCharge;
+    const totalAmount = itemsTotal + deliveryCharge + platformFee + vendorProtectionFee;
 
-    if(itemsTotal<200){
+    if(itemsTotal<100){
         return res.status(400).json({
-            message:"Minimum order amount is ₹200"
+            message:"Minimum order amount is ₹100"
         })
     }
 
-// upto here
         const newOrder=await Orders.create({
             userId,
-            //items,
             items:updatedItems,
             itemsTotal,
             deliveryCharge,
+            platformFee,
+            vendorProtectionFee,
             totalAmount,
             paymentMethod:paymentMethod,
-            paymentStatus:paymentStatus || "Pending"
+            paymentStatus:paymentStatus || "Pending",
+            deliveryOTP: Math.floor(1000 + Math.random() * 9000).toString()
         })
 
 

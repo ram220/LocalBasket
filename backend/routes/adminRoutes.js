@@ -16,5 +16,6 @@ router.patch('/approveAgent/:agentId',authMiddlewares.protectRoutes,authMiddlewa
 router.delete('/deleteAgent/:agentId',authMiddlewares.protectRoutes,authMiddlewares.isAdmin,adminControllers.deleteAgent);
 router.get('/getApprovedAgents',authMiddlewares.protectRoutes,authMiddlewares.isAdmin,adminControllers.getApprovedAgents);
 router.post('/assignDeliveryAgent',authMiddlewares.protectRoutes,authMiddlewares.isAdmin,adminControllers.assignDeliveryAgent);
+router.get('/getPlatformEarnings', authMiddlewares.protectRoutes, authMiddlewares.isAdmin, adminControllers.getPlatformEarnings);
 
 module.exports=router;

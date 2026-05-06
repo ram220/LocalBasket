@@ -50,6 +50,14 @@ const ordersSchema = new mongoose.Schema({
         required:true,
         default:20
     },
+    platformFee:{
+        type:Number,
+        default:0
+    },
+    vendorProtectionFee:{
+        type:Number,
+        default:0
+    },
     totalAmount:{
         type:Number,
         required:true,
@@ -77,6 +85,9 @@ const ordersSchema = new mongoose.Schema({
         type:String,
         enum:["Not Assigned","Assigned","Picked","Out for Delivery","Delivered","Pending"],
         default:"Not Assigned"
+    },
+    deliveryOTP:{
+        type:String
     }
 },{timestamps:true});
 

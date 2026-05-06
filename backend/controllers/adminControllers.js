@@ -105,7 +105,7 @@ exports.activateVendorSubscription = async(req,res)=>{
 exports.rejectVendor=async(req,res)=>{
     try{
         const {vendorId}=req.params;
-        const vendor=await Vendors.findByIdAndUpdate(vendorId,{status:"reject"},{new:true});
+        const vendor=await Vendors.findByIdAndUpdate(vendorId,{status:"rejected"},{new:true});
         if(!vendor){
             return res.status(404).json({
                 status: "fail",
@@ -423,3 +423,35 @@ exports.assignDeliveryAgent=async(req,res)=>{
 }
 
 
+
+// get platform earnings stats
+exports.getPlatformEarnings = async (req, res) => {
+  try {
+    const earnings = await Orders.aggregate([
+      {
+        $match: { orderStatus: "Delivered" }
+      },
+      {
+        $group: {
+          _id: {
+            month: { $month: "$createdAt" },
+            year: { $year: "$createdAt" }
+          },
+          totalEarnings: { $sum: "$platformFee" },
+          orderCount: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { "_id.year": 1, "_id.month": 1 }
+      }
+    ]);
+
+    res.json({
+        status: "success",
+        earnings
+    });
+
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching platform earnings" });
+  }
+};

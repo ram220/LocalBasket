@@ -32,13 +32,18 @@ exports.getAssignedOrders=async(req,res)=>{
 
 exports.updateDeliveryStatus=async(req,res)=>{
     try{
-        const {orderId,status}=req.body;
+        const {orderId,status,otp}=req.body;
 
         const order=await Orders.findById(orderId)
 
-        order.deliveryStatus=status;
         if(status==="Delivered"){
+            if(!otp || otp !== order.deliveryOTP){
+                return res.status(400).json({
+                    message: "Invalid or missing OTP for delivery completion"
+                });
+            }
             order.orderStatus="Delivered"
+            
             const agent = await DeliveryAgent.findById(order.deliveryAgentId);
 
             if (agent) {
@@ -58,15 +63,14 @@ exports.updateDeliveryStatus=async(req,res)=>{
             if (pendingOrder) {
                 await autoAssignAgent(pendingOrder._id);
             }
-
         }
 
-
+        order.deliveryStatus=status;
         await order.save();
 
         res.status(200).json({
             status:"success",
-            message:"status upadted"
+            message:"status updated"
         });
     }
     catch(err){
