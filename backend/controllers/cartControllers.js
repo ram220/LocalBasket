@@ -110,7 +110,7 @@ exports.getCart=async(req,res)=>{
         const userId=req.user.id;
 
         const cart=await Cart.findOne({userId})
-            .populate("items.productId", "name price image expiryDate")
+            .populate("items.productId", "name price image expiryDate isOffer discountPercentage")
             .populate("items.vendorId", "shopName category");
 
         if(!cart){
@@ -193,7 +193,7 @@ exports.updateQuantity = async(req,res)=>{
         await cart.save();
 
         const updatedCart = await Cart.findOne({userId})
-            .populate("items.productId", "name price image expiryDate")
+            .populate("items.productId", "name price image expiryDate isOffer discountPercentage")
             .populate("items.vendorId", "shopName category");
 
 
@@ -256,7 +256,7 @@ exports.removeFromCart=async(req,res)=>{
         await cart.save();
 
         const updatedCart=await Cart.findOne({userId})
-            .populate("items.productId", "name price image")
+            .populate("items.productId", "name price image isOffer discountPercentage")
             .populate("items.vendorId", "shopName category");
 
 

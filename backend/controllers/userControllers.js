@@ -246,11 +246,16 @@ exports.getOfferProducts = async(req,res)=>{
         threeDaysLater.setDate(today.getDate() + 3);
 
         const products = await Products.find({
-            expiryDate:{
-                $gte:today,
-                $lte:threeDaysLater
-            },
-            inStock:true
+            $or: [
+                {
+                    expiryDate: {
+                        $gte: today,
+                        $lte: threeDaysLater
+                    }
+                },
+                { isOffer: true }
+            ],
+            inStock: true
         }).populate("vendorId", "name shopName status isShopOpen subscriptionStatus");
 
         const filtered = products.filter(

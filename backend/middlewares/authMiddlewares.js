@@ -44,7 +44,7 @@ exports.protectRoutes=async(req,res,next)=>{
         }
 
 
-        if (user.passwordChangedAt) {
+        if (user && user.passwordChangedAt) {
             const changedTime = parseInt(user.passwordChangedAt.getTime() / 1000, 10);
 
             if (decodedToken.iat < changedTime) {
