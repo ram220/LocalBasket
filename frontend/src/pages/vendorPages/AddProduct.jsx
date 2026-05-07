@@ -9,7 +9,9 @@ function AddProduct() {
     category:"",
     description:"",
     expiryDate:"",
-    keywords:""
+    keywords:"",
+    isOffer: false,
+    discountPercentage: ""
   });
 
   const [image, setImage] = useState(null);
@@ -17,7 +19,11 @@ function AddProduct() {
   const [loading, setLoading] = useState(false);
 
   const handleChange=(e)=>{
-    setFormData({...formData, [e.target.name]: e.target.value})
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value
+    });
   };
 
   const handleSubmit=async(e)=>{
@@ -32,6 +38,8 @@ function AddProduct() {
       data.append("category", formData.category);
       data.append("description", formData.description);
       data.append("expiryDate", formData.expiryDate);
+      data.append("isOffer", formData.isOffer);
+      data.append("discountPercentage", formData.isOffer ? formData.discountPercentage : 0);
 
       formData.keywords.split(",").forEach(k => {
         data.append("keywords", k.trim());
@@ -158,6 +166,36 @@ function AddProduct() {
               onChange={handleChange}
               style={{ border: "1px solid #ddd", borderRadius: "8px", width: "100%", padding: "10px" }}
             />
+          </div>
+
+          <div className="mt-3 p-3" style={{ border: "1px solid #eee", borderRadius: "8px", background: "#fcfcfc" }}>
+            <div className="d-flex align-items-center gap-2">
+              <input
+                type="checkbox"
+                id="isOffer"
+                name="isOffer"
+                checked={formData.isOffer}
+                onChange={handleChange}
+                style={{ width: "20px", height: "20px" }}
+              />
+              <label htmlFor="isOffer" style={{ margin: 0, fontWeight: "bold" }}>Add Special Offer</label>
+            </div>
+
+            {formData.isOffer && (
+              <div className="mt-2 animate__animated animate__fadeIn">
+                <h5>Discount Percentage (%)</h5>
+                <input
+                  type="number"
+                  placeholder="e.g. 10, 20, 50"
+                  name="discountPercentage"
+                  value={formData.discountPercentage}
+                  onChange={handleChange}
+                  min="0"
+                  max="100"
+                  style={{ border: "1px solid #ddd", borderRadius: "8px", width: "100%", padding: "10px" }}
+                />
+              </div>
+            )}
           </div>
 
 

@@ -30,15 +30,18 @@ function ViewProducts() {
 
     // update price
 
-    const updatePrice = async(productId,newPrice)=>{
+    const updateProduct = async(productId, updates)=>{
       try{
-        const res=await axios.patch(`${API_URL}/api/vendor/updateProduct/${productId}`,{price:newPrice},{
+        const res=await axios.patch(`${API_URL}/api/vendor/updateProduct/${productId}`,updates,{
           headers:{Authorization:`Bearer ${token}`}
         })
         const updatedProductName=res.data.updatedProduct.name;
-        setProducts((prev)=>prev.map((prod)=> prod._id === productId ? { ...prod, price:res.data.updatedProduct.price, originalPrice: res.data.updatedProduct.price } : prod));
+        
+        setProducts((prev)=>prev.map((prod)=> 
+          prod._id === productId ? { ...prod, ...res.data.updatedProduct, originalPrice: res.data.updatedProduct.price } : prod
+        ));
 
-        alert(`price of ${updatedProductName} updated`)
+        if (updates.price) alert(`price of ${updatedProductName} updated`);
       }
       catch(err){
         const message=err.response?.data.message;
@@ -93,6 +96,7 @@ function ViewProducts() {
                 <th>Category</th>
                 <th>Price</th>
                 <th>In Stock</th>
+                <th>Offer %</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -124,7 +128,7 @@ function ViewProducts() {
                       <button className="btn btn-sm" 
                         style={{backgroundColor:"rgb(252, 107, 3)", color: "white", border:"none"}}
                         disabled={Number(p.price) === Number(p.originalPrice)}
-                        onClick={()=>updatePrice(p._id, Number(p.price))}
+                        onClick={()=>updateProduct(p._id, {price: Number(p.price)})}
                       >Update</button>
                     </div>
                   </td>
@@ -135,6 +139,29 @@ function ViewProducts() {
                         <input type="checkbox" checked={p.inStock} onChange={()=>toggleStock(p._id,p.inStock)}/>
                         <span className="slider"></span>
                     </label>
+                  </td>
+
+                  {/* offer management */}
+                  <td>
+                    <div className="d-flex align-items-center gap-1">
+                      <input 
+                        type="checkbox" 
+                        checked={p.isOffer} 
+                        onChange={(e)=>updateProduct(p._id, {isOffer: e.target.checked})}
+                      />
+                      {p.isOffer && (
+                        <input 
+                          type="number" 
+                          className="form-control form-control-sm"
+                          value={p.discountPercentage} 
+                          style={{width:"60px"}}
+                          onBlur={(e)=>updateProduct(p._id, {discountPercentage: Number(e.target.value)})}
+                          onChange={(e)=>{ 
+                            setProducts((prev)=> prev.map((prod)=> prod._id === p._id ? { ...prod, discountPercentage: Number(e.target.value)} : prod))
+                          }}
+                        />
+                      )}
+                    </div>
                   </td>
 
                   {/* delete button */}
