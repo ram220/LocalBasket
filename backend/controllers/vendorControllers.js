@@ -28,7 +28,7 @@ const upload=multer({storage,
 
 exports.addProduct=async(req,res)=>{
     try{
-        const {name,price,category,description,expiryDate,keywords}=req.body;
+        const {name,price,category,description,expiryDate,keywords,isOffer,discountPercentage}=req.body;
         
         const vendorId=req.user.id;
         const vendor=await Vendors.findById(vendorId);
@@ -52,7 +52,7 @@ exports.addProduct=async(req,res)=>{
             imageUrl=req.file.path;
         }
 
-        const product=await Products.create({name,price,category,image:imageUrl,description,expiryDate,keywords,vendorId});
+        const product=await Products.create({name,price,category,image:imageUrl,description,expiryDate,keywords,vendorId,isOffer,discountPercentage});
 
         res.status(201).json({
             status:"success",

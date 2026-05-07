@@ -21,6 +21,8 @@ const productsSchema=new mongoose.Schema({
     },
     description:{type:String,default:"No description yet"},
     inStock: { type: Boolean, default: true },
+    isOffer: { type: Boolean, default: false },
+    discountPercentage: { type: Number, default: 0 },
     expiryDate: {
         type: Date,
         default:null
