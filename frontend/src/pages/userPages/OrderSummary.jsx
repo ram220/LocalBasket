@@ -41,7 +41,7 @@ function OrderSummary({ cart,setCart }) {
   const vendorSubtotals = {};
   cart.forEach(item => {
       const vId = item.vendorId?._id || item.productId?.vendorId?._id || item.productId?.vendorId || "unknown";
-      const vName = item.productId?.vendorId?.shopName || "this shop";
+      const vName = item.vendorId?.shopName || item.productId?.vendorId?.shopName || "this shop";
       if (!vendorSubtotals[vId]) vendorSubtotals[vId] = { amount: 0, name: vName };
       vendorSubtotals[vId].amount += item.finalPrice * item.quantity;
   });

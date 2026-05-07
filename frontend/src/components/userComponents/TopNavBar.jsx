@@ -95,6 +95,7 @@ function TopNavBar({isLoggedIn,logoutUser,cart}) {
                     <ul className="nav-links d-none d-md-flex me-4 mb-0 align-items-center">
                         <li><Link to="/">Home</Link></li>
                         <li><Link to="/products">Products</Link></li>
+                        <li><Link to="/offers">Offers</Link></li>
                         {isLoggedIn && (
                           <li>
                             <Link to="/my_orders" className="d-flex align-items-center">
@@ -135,6 +136,7 @@ function TopNavBar({isLoggedIn,logoutUser,cart}) {
                         <div className="d-flex flex-column gap-3">
                             <Link to="/" onClick={() => setMenuOpen(false)}>Home</Link>
                             <Link to="/products" onClick={() => setMenuOpen(false)}>Products</Link>
+                            <Link to="/offers" onClick={() => setMenuOpen(false)}>Offers</Link>
                             {isLoggedIn && <Link to="/my_orders" onClick={() => setMenuOpen(false)}>My Orders</Link>}
                             <div className="border-top pt-3 mt-2">
                                 {isLoggedIn ? (
