@@ -3,6 +3,8 @@ const dotenv=require('dotenv');
 dotenv.config({path:'./.env'});
 const connectDb=require('./config/db');
 const cors=require('cors');
+const http=require('http');
+const { Server }=require('socket.io');
 
 const authRoutes=require('./routes/authRoutes');
 const adminRoutes=require('./routes/adminRoutes');
@@ -49,7 +51,64 @@ app.get("/api/test-email", async (req, res) => {
     }
 });
 
+const server=http.createServer(app);
+const io=new Server(server,{
+    cors:{
+        origin:"*",
+        methods:["GET","POST","PATCH","PUT"]
+    }
+});
+
+io.on("connection",(socket)=>{
+    console.log("🔌 Client connected to Socket.IO: ",socket.id);
+    
+    socket.on("join_order_room",({orderId})=>{
+        socket.join(orderId);
+        console.log(`👥 Client ${socket.id} joined room for order: ${orderId}`);
+    });
+    
+    socket.on("update_agent_location",async(data)=>{
+        const {orderId,agentId,lat,lng,bearing}=data;
+        
+        // Broadcast to other sockets in the same room (user/vendor/admin)
+        socket.to(orderId).emit("agent_location_broadcasted",{
+            lat,
+            lng,
+            bearing,
+            lastUpdatedAt:new Date()
+        });
+        
+        // Save to MongoDB asynchronously
+        try{
+            const Orders=require('./models/ordersModel');
+            const DeliveryAgent=require('./models/deliveryAgentModel');
+            
+            await Orders.findByIdAndUpdate(orderId,{
+                $set:{
+                    "tracking.currentAgentLocation.coordinates":[lng,lat],
+                    "tracking.bearing":bearing || 0,
+                    "tracking.lastUpdatedAt":new Date()
+                }
+            });
+            
+            if(agentId){
+                await DeliveryAgent.findByIdAndUpdate(agentId,{
+                    $set:{
+                        "currentLocation.coordinates":[lng,lat]
+                    }
+                });
+            }
+        }catch(error){
+            console.error("Error updating location in database from socket: ",error.message);
+        }
+    });
+    
+    socket.on("disconnect",()=>{
+        console.log("🔌 Client disconnected from Socket.IO: ",socket.id);
+    });
+});
+
 const port=process.env.PORT || 7000;
-app.listen(port,()=>{
+server.listen(port,()=>{
     console.log("server running on port: ",port);
 });

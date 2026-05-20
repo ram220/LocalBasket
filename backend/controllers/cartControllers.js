@@ -120,17 +120,18 @@ exports.getCart=async(req,res)=>{
             })
         }
 
-        //9 lines
-        const updatedItems = cart.items.map(item => {
-    const offerData = calculateOffer(item.productId);
+        // Filter out items whose products have been deleted in the database
+        const validItems = cart.items.filter(item => item.productId !== null && item.productId !== undefined);
+        const updatedItems = validItems.map(item => {
+            const offerData = calculateOffer(item.productId);
 
-    return {
-        ...item.toObject(),
-        finalPrice: offerData.finalPrice || item.productId.price,
-        isOffer: offerData.isOffer || false,
-        discountPercentage: offerData.discountPercentage || 0
-    };
-});
+            return {
+                ...item.toObject(),
+                finalPrice: offerData.finalPrice || item.productId.price,
+                isOffer: offerData.isOffer || false,
+                discountPercentage: offerData.discountPercentage || 0
+            };
+        });
 
 //upto here
 
@@ -197,17 +198,18 @@ exports.updateQuantity = async(req,res)=>{
             .populate("items.vendorId", "shopName category");
 
 
-        // from here
-        const updatedItems = updatedCart.items.map(item => {
-    const offerData = calculateOffer(item.productId);
+        // Filter out items whose products have been deleted in the database
+        const validItems = updatedCart.items.filter(item => item.productId !== null && item.productId !== undefined);
+        const updatedItems = validItems.map(item => {
+            const offerData = calculateOffer(item.productId);
 
-    return {
-        ...item.toObject(),
-        finalPrice: offerData.finalPrice || item.productId.price,
-        isOffer: offerData.isOffer || false,
-        discountPercentage: offerData.discountPercentage || 0
-    };
-});
+            return {
+                ...item.toObject(),
+                finalPrice: offerData.finalPrice || item.productId.price,
+                isOffer: offerData.isOffer || false,
+                discountPercentage: offerData.discountPercentage || 0
+            };
+        });
 
 res.status(200).json({
     status: 'success',
@@ -260,18 +262,18 @@ exports.removeFromCart=async(req,res)=>{
             .populate("items.vendorId", "shopName category");
 
 
-        // from here 
+        // Filter out items whose products have been deleted in the database
+        const validItems = updatedCart.items.filter(item => item.productId !== null && item.productId !== undefined);
+        const updatedItems = validItems.map(item => {
+            const offerData = calculateOffer(item.productId);
 
-const updatedItems = updatedCart.items.map(item => {
-    const offerData = calculateOffer(item.productId);
-
-    return {
-        ...item.toObject(),
-        finalPrice: offerData.finalPrice || item.productId.price,
-        isOffer: offerData.isOffer || false,
-        discountPercentage: offerData.discountPercentage || 0
-    };
-});
+            return {
+                ...item.toObject(),
+                finalPrice: offerData.finalPrice || item.productId.price,
+                isOffer: offerData.isOffer || false,
+                discountPercentage: offerData.discountPercentage || 0
+            };
+        });
 
 res.status(200).json({
     status: "success",

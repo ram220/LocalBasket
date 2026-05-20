@@ -88,8 +88,48 @@ const ordersSchema = new mongoose.Schema({
     },
     deliveryOTP:{
         type:String
+    },
+    pickupLocation: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            default: [80.6480, 16.5062]
+        }
+    },
+    deliveryLocation: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            default: [80.6480, 16.5062]
+        }
+    },
+    tracking: {
+        currentAgentLocation: {
+            type: {
+                type: String,
+                enum: ['Point'],
+                default: 'Point'
+            },
+            coordinates: {
+                type: [Number], // [longitude, latitude]
+                default: [80.6480, 16.5062]
+            }
+        },
+        bearing: { type: Number, default: 0 },
+        lastUpdatedAt: { type: Date }
     }
 },{timestamps:true});
+
+ordersSchema.index({ pickupLocation: '2dsphere' });
+ordersSchema.index({ deliveryLocation: '2dsphere' });
 
 const Orders=mongoose.model("Order",ordersSchema);
 

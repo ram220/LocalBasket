@@ -1,4 +1,11 @@
 const calculateOffer = (product) => {
+    if (!product) {
+        return {
+            isOffer: false,
+            discountPercentage: 0,
+            finalPrice: 0
+        };
+    }
     const today = new Date();
 
     // 1. Prioritize manual vendor offer

@@ -12,7 +12,6 @@ module.exports = function detectIntent(text) {
   if (/offer|discount/.test(text))
     return "SHOW_OFFERS";
 
-  // ================= CHEAPEST BY CATEGORY (🔥 MUST BE BEFORE CHEAP_PRODUCTS)
 
   // ================= GENERIC CHEAP PRODUCTS
   if (/cheap|cheapest|low price|lowest|best price|low cost/.test(text))

@@ -7,6 +7,32 @@ const DeliveryAgent=require('../models/deliveryAgentModel');
 const sendEmail=require('../utils/sendEmail');
 const Admin=require('../models/adminModel');
 const autoAssignAgent=require('../utils/orderAssignment');
+const Users = require('../models/userModel');
+
+// Geocoding helper using OpenStreetMap Nominatim with a timeout to keep order placement ultra-fast
+const geocodeAddress = async (address) => {
+    try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000); // 3-second timeout
+
+        const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(address)}&format=json&limit=1`;
+        const res = await fetch(url, {
+            signal: controller.signal,
+            headers: {
+                "User-Agent": "LocalBasket-MERN-App"
+            }
+        });
+        clearTimeout(timeoutId);
+        
+        const data = await res.json();
+        if (data && data.length > 0) {
+            return [parseFloat(data[0].lon), parseFloat(data[0].lat)]; // [longitude, latitude]
+        }
+    } catch (e) {
+        console.log("Geocoding bypassed/failed for address:", address, e.message);
+    }
+    return null;
+};
 
 exports.placeOrder = async(req,res)=>{
     try{
@@ -22,17 +48,25 @@ exports.placeOrder = async(req,res)=>{
         return res.status(400).json({ message: "Cart is empty" });
     }
 
+    // Filter out items that have deleted products to avoid crashes
+    const validCartItems = cart.items.filter(item => item.productId !== null && item.productId !== undefined);
+
+    if (validCartItems.length === 0) {
+        // If all items in cart are null, clean up database cart and return error
+        await Cart.findOneAndUpdate({ userId }, { items: [] });
+        return res.status(400).json({ message: "All products in your cart are no longer available" });
+    }
+
     let itemsTotal = 0;
-
-// from here 
-
     const updatedItems = [];
 
-    for(const item of cart.items){
-
+    for(const item of validCartItems){
         const product = item.productId;
-
         const vendor = await Vendors.findById(product.vendorId);
+
+        if (!vendor) {
+            continue; // Skip items from deleted vendors or handle appropriately
+        }
 
         if(!vendor.isShopOpen){
             return res.status(403).json({
@@ -54,6 +88,10 @@ exports.placeOrder = async(req,res)=>{
             vendorId: product.vendorId,
             status:"Placed"
         });
+    }
+
+    if (updatedItems.length === 0) {
+        return res.status(400).json({ message: "No valid items to place an order" });
     }
 
 // to here
@@ -88,6 +126,21 @@ exports.placeOrder = async(req,res)=>{
         })
     }
 
+        // Retrieve and geocode user & vendor addresses to populate geographic coordinates dynamically
+        const user = await Users.findById(userId);
+        let userCoords = [80.6480, 16.5062]; // Default (Vijayawada)
+        if (user && user.address) {
+            const coords = await geocodeAddress(user.address);
+            if (coords) userCoords = coords;
+        }
+
+        let vendorCoords = [80.6475, 16.5075]; // Default (Vijayawada)
+        const firstVendor = await Vendors.findById(updatedItems[0]?.vendorId);
+        if (firstVendor && firstVendor.address) {
+            const coords = await geocodeAddress(firstVendor.address);
+            if (coords) vendorCoords = coords;
+        }
+
         const newOrder=await Orders.create({
             userId,
             items:updatedItems,
@@ -98,7 +151,15 @@ exports.placeOrder = async(req,res)=>{
             totalAmount,
             paymentMethod:paymentMethod,
             paymentStatus:paymentStatus || "Pending",
-            deliveryOTP: Math.floor(1000 + Math.random() * 9000).toString()
+            deliveryOTP: Math.floor(1000 + Math.random() * 9000).toString(),
+            deliveryLocation: {
+                type: 'Point',
+                coordinates: userCoords
+            },
+            pickupLocation: {
+                type: 'Point',
+                coordinates: vendorCoords
+            }
         })
 
 

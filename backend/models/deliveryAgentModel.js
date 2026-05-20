@@ -72,11 +72,24 @@ const deliveryAgentSchema=new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    currentLocation: {
+        type: {
+            type: String,
+            enum: ['Point'],
+            default: 'Point'
+        },
+        coordinates: {
+            type: [Number], // [longitude, latitude]
+            default: [80.6480, 16.5062] // Default coordinates (e.g. Vijayawada region as placeholder if not updated yet)
+        }
+    },
     role:{
         type:String,
         default:"delivery_agent"
     }
 },{timestamps:true});
+
+deliveryAgentSchema.index({ currentLocation: '2dsphere' });
 
 const DeliveryAgent=mongoose.model('DeliveryAgent',deliveryAgentSchema);
 
