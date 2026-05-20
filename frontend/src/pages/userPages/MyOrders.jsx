@@ -1,9 +1,39 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import API_URL from "../../config";
+import LiveTrackingMap from "../../components/LiveTrackingMap";
 
 function MyOrders() {
   const [orders,setOrders]=useState([]);
+  const [activeTrackingId, setActiveTrackingId] = useState(null);
+
+  const toggleTrackOrder = (orderId) => {
+    setActiveTrackingId(prev => prev === orderId ? null : orderId);
+  };
+
+  const getCoords = (order, type) => {
+    if (type === "vendor") {
+      const coords = order.pickupLocation?.coordinates;
+      if (coords && coords.length === 2) {
+        return { lng: coords[0], lat: coords[1] };
+      }
+      return { lat: 16.5075, lng: 80.6475 }; // Default vendor shop coords in Vijayawada
+    } else {
+      const coords = order.deliveryLocation?.coordinates;
+      if (coords && coords.length === 2) {
+        return { lng: coords[0], lat: coords[1] };
+      }
+      return { lat: 16.5062, lng: 80.6480 }; // Default user drop coords in Vijayawada
+    }
+  };
+
+  const getAgentCoords = (order) => {
+    const coords = order.tracking?.currentAgentLocation?.coordinates;
+    if (coords && coords.length === 2) {
+      return { lng: coords[0], lat: coords[1] };
+    }
+    return null;
+  };
   
 
   const token=localStorage.getItem("token")
@@ -96,11 +126,36 @@ Delivery Agent:
 </strong>
 </p>
 {order.orderStatus !== "Delivered" && order.orderStatus !== "Cancelled" && (
-  <p className="p-2 rounded" style={{backgroundColor: "#fff3cd", border: "1px solid #ffeeba", display: "inline-block"}}>
-    🔑 Delivery OTP: <strong>{order.deliveryOTP}</strong>
-    <br/>
-    <small className="text-muted">Share this only with the agent at delivery.</small>
-  </p>
+  <div>
+    <p className="p-2 rounded" style={{backgroundColor: "#fff3cd", border: "1px solid #ffeeba", display: "inline-block"}}>
+      🔑 Delivery OTP: <strong>{order.deliveryOTP}</strong>
+      <br/>
+      <small className="text-muted">Share this only with the agent at delivery.</small>
+    </p>
+    
+    {order.deliveryAgentId && (
+      <div className="mt-2 mb-3">
+        <button 
+          className="btn btn-sm btn-outline-primary d-flex align-items-center gap-2 py-2 px-3 fw-bold"
+          onClick={() => toggleTrackOrder(order._id)}
+          style={{ borderRadius: "8px" }}
+        >
+          📍 {activeTrackingId === order._id ? "Hide Tracking Map" : "Track Delivery Agent Live"}
+        </button>
+        
+        {activeTrackingId === order._id && (
+          <div className="mt-3">
+            <LiveTrackingMap 
+              orderId={order._id}
+              vendorLoc={getCoords(order, "vendor")}
+              userLoc={getCoords(order, "user")}
+              initialAgentLoc={getAgentCoords(order)}
+            />
+          </div>
+        )}
+      </div>
+    )}
+  </div>
 )}
                 <p>Payment Method: <strong style={{marginLeft: "5px"}}>
                   {order.paymentMethod === "UPI" ? "UPI (Online)" : "Cash On Delivery"}</strong>

@@ -1,6 +1,77 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
+import { io } from "socket.io-client";
 import API_URL from "../../config";
+
+// Sub-component to publish GPS coordinates dynamically when driving
+function AgentLocationPublisher({ orderId }) {
+    const socketRef = useRef(null);
+    const watchIdRef = useRef(null);
+
+    useEffect(() => {
+        if (!orderId) return;
+
+        socketRef.current = io(API_URL);
+        socketRef.current.emit("join_order_room", { orderId });
+
+        let agentId = "";
+        try {
+            const token = localStorage.getItem("token");
+            if (token) {
+                const base64Url = token.split('.')[1];
+                const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+                const jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+                    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+                }).join(''));
+                const decoded = JSON.parse(jsonPayload);
+                agentId = decoded.id;
+            }
+        } catch (e) {
+            console.error("Error decoding token for agentId", e);
+        }
+
+        if (navigator.geolocation) {
+            console.log(`🚴 Live tracking publisher started for Order: ${orderId}`);
+            watchIdRef.current = navigator.geolocation.watchPosition(
+                (position) => {
+                    const { latitude, longitude, heading } = position.coords;
+                    socketRef.current.emit("update_agent_location", {
+                        orderId,
+                        agentId,
+                        lat: latitude,
+                        lng: longitude,
+                        bearing: heading || 0
+                    });
+                },
+                (error) => {
+                    console.error("❌ GPS Tracking error:", error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        return () => {
+            console.log(`🚴 Live tracking publisher stopped for Order: ${orderId}`);
+            if (watchIdRef.current) {
+                navigator.geolocation.clearWatch(watchIdRef.current);
+            }
+            if (socketRef.current) {
+                socketRef.current.disconnect();
+            }
+        };
+    }, [orderId]);
+
+    return (
+        <div className="alert alert-success d-flex align-items-center mt-3 py-2 px-3 shadow-sm" role="alert" style={{ borderRadius: "8px" }}>
+            <span className="spinner-grow spinner-grow-sm text-success me-2" role="status" aria-hidden="true" style={{ width: "12px", height: "12px" }} />
+            <span className="small fw-bold">Live GPS Tracking Stream Active...</span>
+        </div>
+    );
+}
 
 function AgentOrders(){
     const [orders,setOrders] = useState([]);
@@ -19,6 +90,66 @@ function AgentOrders(){
             setOrders(res.data.orders);
         }catch(err){
             alert("Error fetching orders");
+        }
+    };
+
+    const getDeviceLocation = () => {
+        return new Promise((resolve) => {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        resolve(`${position.coords.latitude},${position.coords.longitude}`);
+                    },
+                    (error) => {
+                        console.warn("⚠️ Device location bypassed:", error.message);
+                        resolve(null);
+                    },
+                    { enableHighAccuracy: true, timeout: 5000 }
+                );
+            } else {
+                resolve(null);
+            }
+        });
+    };
+
+    const openGoogleMapsNavigation = async (order, type = "customer") => {
+        const originCoords = await getDeviceLocation();
+        const originParam = originCoords ? `&origin=${originCoords}` : "";
+
+        if (type === "shop") {
+            let destination = "";
+            const shopCoords = order.pickupLocation?.coordinates;
+            
+            // Check if backend populated a real geocoded coordinate (not the default Vijayawada placeholder)
+            if (shopCoords && shopCoords.length === 2 && (shopCoords[1] !== 16.5075 || shopCoords[0] !== 80.6475)) {
+                destination = `${shopCoords[1]},${shopCoords[0]}`;
+            } else {
+                const firstItem = order.items?.[0];
+                const vendorAddress = firstItem?.productId?.vendorId?.address || firstItem?.vendorId?.address;
+                if (vendorAddress) {
+                    destination = encodeURIComponent(vendorAddress);
+                } else if (shopCoords && shopCoords.length === 2) {
+                    destination = `${shopCoords[1]},${shopCoords[0]}`;
+                } else {
+                    destination = "16.5075,80.6475";
+                }
+            }
+            window.open(`https://www.google.com/maps/dir/?api=1${originParam}&destination=${destination}`, "_blank");
+        } else {
+            let destination = "";
+            const userCoords = order.deliveryLocation?.coordinates;
+
+            // Check if backend populated a real geocoded coordinate (not the default Vijayawada placeholder)
+            if (userCoords && userCoords.length === 2 && (userCoords[1] !== 16.5062 || userCoords[0] !== 80.6480)) {
+                destination = `${userCoords[1]},${userCoords[0]}`;
+            } else if (order.userId?.address) {
+                destination = encodeURIComponent(order.userId.address);
+            } else if (userCoords && userCoords.length === 2) {
+                destination = `${userCoords[1]},${userCoords[0]}`;
+            } else {
+                destination = "16.5062,80.6480";
+            }
+            window.open(`https://www.google.com/maps/dir/?api=1${originParam}&destination=${destination}`, "_blank");
         }
     };
 
@@ -253,7 +384,30 @@ function AgentOrders(){
                                 Delivered
                             </button>
 
+                            {order.deliveryStatus === "Assigned" && (
+                                <button
+                                    className="btn btn-outline-info"
+                                    onClick={() => openGoogleMapsNavigation(order, "shop")}
+                                >
+                                    🗺️ Navigate to Shop
+                                </button>
+                            )}
+
+                            {(order.deliveryStatus === "Picked" || order.deliveryStatus === "Out for Delivery") && (
+                                <button
+                                    className="btn btn-info text-white"
+                                    onClick={() => openGoogleMapsNavigation(order, "customer")}
+                                >
+                                    🗺️ Navigate to Customer
+                                </button>
+                            )}
+
                         </div>
+
+                        {/* LIVE GPS PUBLISHER STREAM */}
+                        {order.deliveryStatus === "Out for Delivery" && (
+                            <AgentLocationPublisher orderId={order._id} />
+                        )}
 
                         {/* COD BUTTON */}
                         {
