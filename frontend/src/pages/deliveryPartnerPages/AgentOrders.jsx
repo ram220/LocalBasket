@@ -114,7 +114,7 @@ function AgentOrders(){
 
     const openGoogleMapsNavigation = async (order, type = "customer") => {
         const originCoords = await getDeviceLocation();
-        const originParam = originCoords ? `&origin=${originCoords}` : "";
+        const isAndroid = /Android/i.test(navigator.userAgent);
 
         if (type === "shop") {
             let destination = "";
@@ -134,7 +134,14 @@ function AgentOrders(){
                     destination = "16.5075,80.6475";
                 }
             }
-            window.open(`https://www.google.com/maps/dir/?api=1${originParam}&destination=${destination}`, "_blank");
+
+            if (isAndroid) {
+                // Open native navigation intent directly without loading intermediate web page!
+                window.location.href = `google.navigation:q=${destination}`;
+            } else {
+                const originParam = originCoords ? `&origin=${originCoords}` : "";
+                window.open(`https://www.google.com/maps/dir/?api=1${originParam}&destination=${destination}`, "_blank");
+            }
         } else {
             let destination = "";
             const userCoords = order.deliveryLocation?.coordinates;
@@ -149,7 +156,14 @@ function AgentOrders(){
             } else {
                 destination = "16.5062,80.6480";
             }
-            window.open(`https://www.google.com/maps/dir/?api=1${originParam}&destination=${destination}`, "_blank");
+
+            if (isAndroid) {
+                // Open native navigation intent directly without loading intermediate web page!
+                window.location.href = `google.navigation:q=${destination}`;
+            } else {
+                const originParam = originCoords ? `&origin=${originCoords}` : "";
+                window.open(`https://www.google.com/maps/dir/?api=1${originParam}&destination=${destination}`, "_blank");
+            }
         }
     };
 
@@ -405,7 +419,7 @@ function AgentOrders(){
                         </div>
 
                         {/* LIVE GPS PUBLISHER STREAM */}
-                        {order.deliveryStatus === "Out for Delivery" && (
+                        {(order.deliveryStatus === "Picked" || order.deliveryStatus === "Out for Delivery") && (
                             <AgentLocationPublisher orderId={order._id} />
                         )}
 

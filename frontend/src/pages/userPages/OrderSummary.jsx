@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import L from "leaflet";
 import axios from "axios";
 import API_URL from "../../config";
 
@@ -10,6 +11,13 @@ function OrderSummary({ cart,setCart }) {
   const navigate=useNavigate()
 
   const [paymentMethod,setPaymentMethod] = useState("COD");
+  
+  // Geolocation Map Pinpoint States
+  const [showMapPicker, setShowMapPicker] = useState(false);
+  const [selectedCoords, setSelectedCoords] = useState(null);
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const markerRef = useRef(null);
 
   const token=localStorage.getItem("token");
 
@@ -33,6 +41,74 @@ function OrderSummary({ cart,setCart }) {
     }
     fetchUserDeatils();
   },[token])
+
+  // Initialize Map Picker Leaflet instances
+  useEffect(() => {
+    if (showMapPicker && mapRef.current && !mapInstance.current) {
+      const defaultLat = 16.5062;
+      const defaultLng = 80.6480;
+
+      const initMap = (lat, lng) => {
+        if (mapInstance.current) return;
+
+        mapInstance.current = L.map(mapRef.current).setView([lat, lng], 15);
+
+        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+        }).addTo(mapInstance.current);
+
+        const pinIcon = new L.Icon({
+          iconUrl: "https://cdn-icons-png.flaticon.com/512/1946/1946436.png", // House Pin Icon
+          iconSize: [36, 36],
+          iconAnchor: [18, 36]
+        });
+
+        markerRef.current = L.marker([lat, lng], { 
+          draggable: true,
+          icon: pinIcon
+        }).addTo(mapInstance.current);
+
+        setSelectedCoords({ lat, lng });
+
+        // Update when marker is dragged
+        markerRef.current.on("dragend", () => {
+          const position = markerRef.current.getLatLng();
+          setSelectedCoords({ lat: position.lat, lng: position.lng });
+        });
+
+        // Update when map is clicked
+        mapInstance.current.on("click", (e) => {
+          const { lat, lng } = e.latlng;
+          if (markerRef.current) {
+            markerRef.current.setLatLng([lat, lng]);
+          }
+          setSelectedCoords({ lat, lng });
+        });
+      };
+
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            initMap(position.coords.latitude, position.coords.longitude);
+          },
+          () => {
+            initMap(defaultLat, defaultLng);
+          },
+          { enableHighAccuracy: true, timeout: 5000 }
+        );
+      } else {
+        initMap(defaultLat, defaultLng);
+      }
+    }
+
+    return () => {
+      if (mapInstance.current) {
+        mapInstance.current.remove();
+        mapInstance.current = null;
+        markerRef.current = null;
+      }
+    };
+  }, [showMapPicker]);
 
   const itemsTotal = cart.reduce((total,item)=>{
     return total + item.finalPrice * item.quantity;
@@ -93,7 +169,12 @@ function OrderSummary({ cart,setCart }) {
         platformFee: PLATFORM_FEE,
         vendorProtectionFee: vendorProtectionFee,
         totalAmount: total,
-        paymentMethod
+        paymentMethod,
+        // Inject accurate delivery geolocation map coordinates if marked
+        deliveryLocation: selectedCoords ? {
+            type: "Point",
+            coordinates: [selectedCoords.lng, selectedCoords.lat] // [longitude, latitude]
+        } : undefined
     };
     try{
       if(paymentMethod==="COD"){
@@ -169,7 +250,39 @@ function OrderSummary({ cart,setCart }) {
             </button>
           </div>
           <p className="mb-1 text-muted small">{address ? address : "No Address Found"}</p>
-          {mobile && <p className="mb-0 text-muted small">📞 {mobile}</p>}
+          {mobile && <p className="mb-2 text-muted small">📞 {mobile}</p>}
+
+          {/* Map Pinpoint picker */}
+          <div className="border-top pt-2 mt-2">
+            <div className="d-flex justify-content-between align-items-center">
+              <span className="small fw-bold text-dark">📍 Pin Exact Location on Map:</span>
+              <button 
+                className="btn btn-sm btn-outline-warning py-1 px-2 font-monospace"
+                style={{ fontSize: "0.75rem", borderRadius: "6px" }}
+                onClick={() => setShowMapPicker(!showMapPicker)}
+              >
+                {showMapPicker ? "Close Map" : "Open Map Picker"}
+              </button>
+            </div>
+            
+            {showMapPicker && (
+              <div className="mt-2">
+                <p className="text-muted small mb-2" style={{ fontSize: "0.75rem" }}>
+                  💡 Drag the pin or tap on the map to pinpoint your house exactly.
+                </p>
+                <div 
+                  ref={mapRef} 
+                  style={{ width: "100%", height: "200px", borderRadius: "8px", border: "1px solid #ccc", zIndex: 10 }} 
+                />
+              </div>
+            )}
+
+            {selectedCoords && (
+              <div className="mt-2 alert alert-success py-1 px-2 mb-0 fw-bold" style={{ fontSize: "0.75rem", borderRadius: "6px" }}>
+                🎯 Precise Delivery Location Pinmarked!
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Payment Method */}
