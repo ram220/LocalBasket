@@ -129,7 +129,11 @@ exports.placeOrder = async(req,res)=>{
         // Retrieve and geocode user & vendor addresses to populate geographic coordinates dynamically
         const user = await Users.findById(userId);
         let userCoords = [80.6480, 16.5062]; // Default (Vijayawada)
-        if (user && user.address) {
+        
+        // Prioritize pinpoint map coordinates from frontend if provided
+        if (req.body.deliveryLocation && Array.isArray(req.body.deliveryLocation.coordinates) && req.body.deliveryLocation.coordinates.length === 2) {
+            userCoords = req.body.deliveryLocation.coordinates;
+        } else if (user && user.address) {
             const coords = await geocodeAddress(user.address);
             if (coords) userCoords = coords;
         }
