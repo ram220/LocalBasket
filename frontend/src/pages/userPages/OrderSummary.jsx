@@ -51,11 +51,36 @@ function OrderSummary({ cart,setCart }) {
       const initMap = (lat, lng) => {
         if (mapInstance.current) return;
 
-        mapInstance.current = L.map(mapRef.current).setView([lat, lng], 15);
+        // 🗺️ Standard schematic map layer
+        const standardLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        });
 
-        L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-        }).addTo(mapInstance.current);
+        // 🛰️ Esri Satellite Imagery + Labels + Roads (Hybrid View) Layer Group
+        const hybridLayer = L.layerGroup([
+          // Base Satellite Layer
+          L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"),
+          // Transparent Village, City, and State Labels Overlay
+          L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"),
+          // Transparent Road and Street Names Overlay
+          L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}")
+        ]);
+
+        // Initialize map with Hybrid view by default (zoom 17 is perfect for seeing houses, fields, and labels)
+        // Set attributionControl to false to hide the bulky text at the bottom-right
+        mapInstance.current = L.map(mapRef.current, {
+          center: [lat, lng],
+          zoom: 17,
+          layers: [hybridLayer],
+          attributionControl: false
+        });
+
+        // Add a clean, collapsed layer switcher icon/menu in the top-right corner
+        const baseMaps = {
+          "🛰️ Hybrid View (Satellite + Labels)": hybridLayer,
+          "🗺️ Standard Map (Roads & Names)": standardLayer
+        };
+        L.control.layers(baseMaps, null, { collapsed: true }).addTo(mapInstance.current);
 
         const pinIcon = new L.Icon({
           iconUrl: "https://cdn-icons-png.flaticon.com/512/1946/1946436.png", // House Pin Icon
@@ -84,20 +109,41 @@ function OrderSummary({ cart,setCart }) {
           }
           setSelectedCoords({ lat, lng });
         });
+
+        // Force Leaflet to recalculate container dimensions after rendering in browser DOM
+        setTimeout(() => {
+          if (mapInstance.current) {
+            mapInstance.current.invalidateSize();
+          }
+        }, 300);
       };
 
+      // Initialize map instantly with fallback coordinates so it displays immediately
+      initMap(defaultLat, defaultLng);
+
+      // Upgrade to precise live geolocation coordinates asynchronously
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
-            initMap(position.coords.latitude, position.coords.longitude);
+            const { latitude, longitude } = position.coords;
+            if (mapInstance.current && markerRef.current) {
+              mapInstance.current.setView([latitude, longitude], 17);
+              markerRef.current.setLatLng([latitude, longitude]);
+              setSelectedCoords({ lat: latitude, lng: longitude });
+              
+              // Force size invalidation again after flying to new position to ensure perfect tile alignment
+              setTimeout(() => {
+                if (mapInstance.current) {
+                  mapInstance.current.invalidateSize();
+                }
+              }, 100);
+            }
           },
-          () => {
-            initMap(defaultLat, defaultLng);
+          (error) => {
+            console.log("Geolocation error or blocked, remaining at default:", error);
           },
           { enableHighAccuracy: true, timeout: 5000 }
         );
-      } else {
-        initMap(defaultLat, defaultLng);
       }
     }
 
