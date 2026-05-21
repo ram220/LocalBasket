@@ -5,8 +5,9 @@ import axios from "axios";
 import API_URL from "../../config";
 
 function OrderSummary({ cart,setCart }) {
-  const [address,setAddress]=useState("");
-  const [mobile,setMobile]=useState("");
+  const [address, setAddress] = useState("");
+  const [extraAddress, setExtraAddress] = useState("");
+  const [mobile, setMobile] = useState("");
   const [loading,setLoading]=useState(false);
   const navigate=useNavigate()
 
@@ -98,7 +99,17 @@ function OrderSummary({ cart,setCart }) {
         // Update when marker is dragged
         markerRef.current.on("dragend", () => {
           const position = markerRef.current.getLatLng();
-          setSelectedCoords({ lat: position.lat, lng: position.lng });
+          const newCoords = { lat: position.lat, lng: position.lng };
+          setSelectedCoords(newCoords);
+          // Reverse geocode to get human readable address
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${newCoords.lat}&lon=${newCoords.lng}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    setAddress(data.display_name);
+                }
+            })
+            .catch(err => console.error('Geocoding error:', err));
         });
 
         // Update when map is clicked
@@ -107,7 +118,17 @@ function OrderSummary({ cart,setCart }) {
           if (markerRef.current) {
             markerRef.current.setLatLng([lat, lng]);
           }
-          setSelectedCoords({ lat, lng });
+          const newCoords = { lat, lng };
+          setSelectedCoords(newCoords);
+          // Reverse geocode for address update
+          fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}`)
+            .then(res => res.json())
+            .then(data => {
+                if (data && data.display_name) {
+                    setAddress(data.display_name);
+                }
+            })
+            .catch(err => console.error('Geocoding error:', err));
         });
 
         // Force Leaflet to recalculate container dimensions after rendering in browser DOM
@@ -245,11 +266,13 @@ function OrderSummary({ cart,setCart }) {
         vendorProtectionFee: vendorProtectionFee,
         totalAmount: total,
         paymentMethod,
-        // Inject accurate delivery geolocation map coordinates if marked
+        // Inject precise delivery geolocation map coordinates and optional extra address
         deliveryLocation: selectedCoords ? {
             type: "Point",
             coordinates: [selectedCoords.lng, selectedCoords.lat] // [longitude, latitude]
-        } : undefined
+        } : undefined,
+        // Save the human‑readable address (including extra details) for reference
+        deliveryAddress: address ? `${address}${extraAddress ? `, ${extraAddress}` : ''}` : undefined
     };
     try{
       if(paymentMethod==="COD"){
@@ -324,8 +347,20 @@ function OrderSummary({ cart,setCart }) {
               Change
             </button>
           </div>
-          <p className="mb-1 text-muted small">{address ? address : "No Address Found"}</p>
+          <p className="mb-1 text-muted small">{address ? `${address}${extraAddress ? `, ${extraAddress}` : ''}` : "No Address Found"}</p>
           {mobile && <p className="mb-2 text-muted small">📞 {mobile}</p>}
+
+            {/* Extra address details input */}
+            <div className="mt-3">
+              <label className="form-label small fw-bold mb-1">House / Landmark (optional)</label>
+              <input
+                type="text"
+                className="form-control form-control-sm"
+                placeholder="e.g., House No. 12, Near Temple"
+                value={extraAddress}
+                onChange={e => setExtraAddress(e.target.value)}
+              />
+            </div>
 
           {/* Map Pinpoint picker */}
           <div className="border-top pt-2 mt-2">
@@ -370,11 +405,11 @@ function OrderSummary({ cart,setCart }) {
               </div>
             )}
 
-            {selectedCoords && (
-              <div className="mt-2 alert alert-success py-1 px-2 mb-0 fw-bold" style={{ fontSize: "0.75rem", borderRadius: "6px" }}>
-                🎯 Precise Delivery Location Pinmarked!
-              </div>
-            )}
+              {selectedCoords && (
+                <div className="mt-2 alert alert-success py-1 px-2 mb-0 fw-bold" style={{ fontSize: "0.75rem", borderRadius: "6px" }}>
+                  🎯 Precise Delivery Location Pinmarked! Coordinates: {selectedCoords.lat.toFixed(6)}, {selectedCoords.lng.toFixed(6)}
+                </div>
+              )}
           </div>
         </div>
 
