@@ -156,6 +156,35 @@ function OrderSummary({ cart,setCart }) {
     };
   }, [showMapPicker]);
 
+  const requestPreciseLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          if (mapInstance.current && markerRef.current) {
+            mapInstance.current.setView([latitude, longitude], 17);
+            markerRef.current.setLatLng([latitude, longitude]);
+            setSelectedCoords({ lat: latitude, lng: longitude });
+            
+            // Force Leaflet container dimensions recalculation to align map tiles
+            setTimeout(() => {
+              if (mapInstance.current) {
+                mapInstance.current.invalidateSize();
+              }
+            }, 100);
+          }
+        },
+        (error) => {
+          alert("Could not retrieve precise location. Please ensure location services are turned ON and permissions are allowed for LocalBasket in your browser settings.");
+          console.log("Precise GPS Retrieval Error:", error);
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      );
+    } else {
+      alert("Geolocation is not supported by your browser or device.");
+    }
+  };
+
   const itemsTotal = cart.reduce((total,item)=>{
     return total + item.finalPrice * item.quantity;
   },0);
@@ -313,9 +342,27 @@ function OrderSummary({ cart,setCart }) {
             
             {showMapPicker && (
               <div className="mt-2">
-                <p className="text-muted small mb-2" style={{ fontSize: "0.75rem" }}>
-                  💡 Drag the pin or tap on the map to pinpoint your house exactly.
-                </p>
+                <div className="d-flex justify-content-between align-items-center mb-2">
+                  <span className="text-muted small" style={{ fontSize: "0.75rem" }}>
+                    💡 Drag the pin or tap on the map to pinpoint your house.
+                  </span>
+                  <button
+                    type="button"
+                    className="btn btn-sm text-white fw-bold shadow-sm"
+                    style={{ 
+                      fontSize: "0.75rem", 
+                      borderRadius: "6px", 
+                      height: "26px", 
+                      lineHeight: "1.2",
+                      backgroundColor: "rgb(252, 107, 3)", 
+                      borderColor: "rgb(252, 107, 3)",
+                      padding: "2px 8px"
+                    }}
+                    onClick={requestPreciseLocation}
+                  >
+                    🎯 Locate Me
+                  </button>
+                </div>
                 <div 
                   ref={mapRef} 
                   style={{ width: "100%", height: "200px", borderRadius: "8px", border: "1px solid #ccc", zIndex: 10 }} 
